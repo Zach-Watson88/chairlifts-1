@@ -1,8 +1,11 @@
-
 // Chairlift AI Riding Coach — Vercel serverless function.
 // Receives up to 6 JPEG frames from a rider's video plus a few details,
 // asks Claude Haiku 5.5 to analyze technique, and returns JSON.
 // Needs the environment variable ANTHROPIC_API_KEY (Vercel → Settings → Environment Variables).
+// Requires a logged-in account. Free accounts get a limited number of analyses
+// per month; Pro accounts are unlimited. Each result is saved to the user's history in Neon.
+const { sql } = require("../lib/db");
+const { currentUser, coachLeft, monthKey } = require("../lib/auth");
 
 const LEVELS = ["First season (greens)", "Intermediate (blues)", "Advanced (blacks)", "Expert (double blacks, trees)"];
 const clip = (v, n) => String(v || "").replace(/[\r\n"]+/g, " ").slice(0, n);
@@ -20,6 +23,11 @@ Give 2 or 3 fixes, most important first. Keep every field short. Never suggest t
 
 module.exports = async (req, res) => {
   if (req.method !== "POST") return res.status(405).json({ error: "method", message: "Use POST." });
+  let u;
+  try { u = await currentUser(req); }
+  catch (e) { return res.status(503).json({ error: e.code === "no_db" ? "no_db" : "server" }); }
+  if (!u) return res.status(401).json({ error: "login_required" });
+  if (coachLeft(u) === 0) return res.status(402).json({ error: "upgrade_needed" });
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) return res.status(500).json({ error: "missing_key" });
 
@@ -57,7 +65,28 @@ module.exports = async (req, res) => {
     const text = (j.content || []).filter(x => x.type === "text").map(x => x.text).join("");
     const m = text.match(/\{[\s\S]*\}/);
     if (!m) return res.status(502).json({ error: "ai_error", message: "No JSON in reply" });
-    return res.status(200).json({ result: JSON.parse(m[0]) });
+    const result = JSON.parse(m[0]);
+    let history = null, left = coachLeft(u);
+    try {
+      if (!u.is_pro) {
+        const mk = monthKey();
+        const [nu] = await sql()`UPDATE users SET coach_uses = CASE WHEN coach_month = ${mk} THEN coach_uses + 1 ELSE 1 END,
+          coach_month = ${mk} WHERE id = ${u.id} RETURNING *`;
+        left = coachLeft(nu);
+      }
+      if (result && result.visible !== false) {
+        const entry = { ts: Date.now(), mtn: ctx.mtn, run: ctx.run, sport: ctx.sport, level: String(result.level || "").slice(0, 80),
+          verdict: String(result.verdict || "").slice(0, 400),
+          cues: (Array.isArray(result.fixes) ? result.fixes : []).map(f => String((f && f.cue) || "").slice(0, 60)).filter(Boolean).slice(0, 3) };
+        const [d] = await sql()`INSERT INTO user_data (user_id, coach_history) VALUES (${u.id}, ${JSON.stringify([entry])}::jsonb)
+          ON CONFLICT (user_id) DO UPDATE SET coach_history =
+            (SELECT COALESCE(jsonb_agg(x), '[]'::jsonb) FROM (SELECT x FROM jsonb_array_elements(${JSON.stringify([entry])}::jsonb || user_data.coach_history) x LIMIT 30) t),
+            updated_at = now()
+          RETURNING coach_history`;
+        history = d.coach_history;
+      }
+    } catch (e) { console.error(e); }
+    return res.status(200).json({ result, coachLeft: left, history });
   } catch (e) {
     return res.status(502).json({ error: "ai_error", message: String(e && e.message || e) });
   }

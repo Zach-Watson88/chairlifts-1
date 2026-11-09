@@ -48,6 +48,8 @@ nav.tabs{display:flex;gap:4px;padding-block:0}
 nav.tabs button{flex:1;font:800 17px/1 var(--display);letter-spacing:.06em;text-transform:uppercase;background:none;border:0;color:#cfe3de;padding:12px 4px 13px;border-bottom:3px solid transparent;cursor:pointer}
 nav.tabs button[aria-selected="true"]{color:#fff;border-bottom-color:#ff8a5c}
 nav.tabs button:focus-visible{outline:2px solid #fff;outline-offset:-2px}
+nav.tabs button{white-space:nowrap}
+@media(max-width:440px){nav.tabs button{font-size:15px;letter-spacing:.03em}}
 main{padding-block:18px 48px;display:grid;gap:16px}
 .notice{font:500 12px var(--mono);color:var(--muted);letter-spacing:.02em}
 .hero{display:grid;gap:6px}
@@ -174,6 +176,52 @@ footer.credit b{font:800 18px/1 var(--display);letter-spacing:.05em;text-transfo
 .hist b{font-weight:600}
 .hist p{margin:0;grid-column:1/-1;color:var(--muted);font-size:14px}
 .hist .meta{font:500 12px var(--mono);color:var(--muted);white-space:nowrap}
+.brandrow{flex-wrap:wrap}
+a.brandlink{text-decoration:none;color:inherit}
+.toprt{display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:wrap;justify-content:flex-end}
+.acct{display:inline-flex;align-items:center;gap:6px;font:600 14px var(--body);color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.35);border-radius:99px;padding:7px 14px;white-space:nowrap}
+.acct:hover{background:rgba(255,255,255,.12)}
+.acct:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.probadge{font:500 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;background:#ff8a5c;color:#1a0d06;padding:2px 6px;border-radius:4px}
+@media(max-width:560px){.pick label{display:none}.pick select{max-width:48vw}}
+.eyebrow{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0}
+.land-hero{display:grid;gap:14px;padding-block:8px 4px}
+.land-hero h1{font:800 clamp(46px,9vw,88px)/.9 var(--display);text-transform:uppercase;margin:0;text-wrap:balance;max-width:13ch}
+.land-hero .lede{font-size:18px;line-height:1.5;max-width:60ch;margin:0}
+.sect{display:grid;gap:12px}
+.sect h2{font:800 30px/1 var(--display);text-transform:uppercase;letter-spacing:.02em;margin:0;text-wrap:balance}
+.sect>p{margin:0;max-width:65ch;color:var(--muted)}
+.pitch{display:grid;gap:20px;grid-template-columns:1fr}
+@media(min-width:820px){.pitch{grid-template-columns:1.1fr .9fr;align-items:center}}
+.steps{margin:0;padding-left:22px;display:grid;gap:10px;max-width:56ch}
+.steps b{display:block}
+.sample-card{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--bg);display:grid;gap:6px}
+.sample-card h3{font:800 19px/1.1 var(--display);text-transform:uppercase;letter-spacing:.03em;margin:0}
+.sample-card p{margin:0;color:var(--muted);font-size:14px}
+.feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.feat div{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;min-width:0}
+.feat div.hl{border:2px solid var(--accent)}
+.feat b{display:block;font:800 19px/1.1 var(--display);text-transform:uppercase;letter-spacing:.03em}
+.feat p{margin:6px 0 0;color:var(--muted);font-size:14px}
+.vs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.vs div{padding:16px;border-radius:12px;background:var(--soft);display:grid;gap:4px}
+.vs span{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.vs b{font:800 36px/1 var(--display);font-variant-numeric:tabular-nums}
+.vs div.win{background:color-mix(in srgb,var(--accent) 14%,var(--panel))}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.plan{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:10px;align-content:start;min-width:0}
+.plan.pro{border:2px solid var(--accent)}
+.plan h3{font:800 22px/1 var(--display);text-transform:uppercase;letter-spacing:.04em;margin:0;display:flex;gap:8px;align-items:center}
+.plan .price{font:800 44px/1 var(--display);font-variant-numeric:tabular-nums}
+.plan .price small{font:500 14px var(--body);color:var(--muted);margin-left:4px}
+.plan ul{margin:0;padding-left:18px;display:grid;gap:5px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:99px;padding:3px;gap:2px;margin-bottom:14px}
+.seg button{font:600 14px var(--body);border:0;background:none;color:var(--muted);padding:7px 16px;border-radius:99px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+#authForm,#meBox{display:grid;gap:10px}
+a.btn{text-decoration:none;display:inline-block}
+.quota{font:500 12px var(--mono);color:var(--muted);margin:8px 0 0}
+.planrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -183,8 +231,8 @@ footer.credit b{font:800 18px/1 var(--display);letter-spacing:.05em;text-transfo
 <header class="top">
   <div class="wrap">
     <div class="brandrow">
-      <div><div class="brand">Chair<span>lift</span></div><div class="byline">by Zach Watson</div></div>
-      <div class="pick"><label for="mtnSel">I'm at</label><select id="mtnSel"></select></div>
+      <a class="brandlink" href="#home" aria-label="Chairlift home"><div class="brand">Chair<span>lift</span></div><div class="byline">by Zach Watson</div></a>
+      <div class="toprt"><div class="pick"><label for="mtnSel">I'm at</label><select id="mtnSel"></select></div><a class="acct" id="acctBtn" href="#account">Log in</a></div>
     </div>
     <nav class="tabs" role="tablist">
       <button role="tab" id="tab-mountain" aria-selected="true" data-view="mountain">Mountain</button>
@@ -197,16 +245,102 @@ footer.credit b{font:800 18px/1 var(--display);letter-spacing:.05em;text-transfo
 
 <div class="wrap">
 <main>
-  <section class="about" aria-labelledby="aboutTitle">
-    <div class="about-text">
-      <p class="eyebrow">About Chairlift</p>
-      <h2 id="aboutTitle">One app for your whole day on the mountain</h2>
-      <p>Chairlift is a mobile web app for skiers and snowboarders. Pick the mountain you're at to see which runs and lifts are open, when the lifts and lodges open and close, and today's snow and weather conditions. Track your speed and runs as you ride and count your days on snow across the season. The AI Riding Coach turns a short phone video of your run into a technique breakdown with drills for your next run, and you can rate and review mountains on a five-star scale.</p>
+  <!-- HOME VIEW -->
+  <div id="view-home" class="view" style="display:grid;gap:28px">
+    <section class="land-hero">
+      <p class="eyebrow">Chairlift · Created by Zach Watson</p>
+      <h1>Get better every time you ride</h1>
+      <p class="lede">Chairlift is the ski and snowboard app for college riders in the Northeast who get out ten or more days a season. See what's open at your mountain, track every run, and get coached by AI from a short phone video of yourself.</p>
+      <div class="btnrow"><a class="btn primary" href="#account" data-go="signup">Create a free account</a><a class="btn" href="#coach">See the AI Riding Coach</a></div>
+      <p class="notice">Free to start. Chairlift Pro is $4.99 a month for unlimited coaching.</p>
+    </section>
+
+    <section class="panel pitch">
+      <div class="sect">
+        <p class="eyebrow">The AI Riding Coach</p>
+        <h2>A coach in your pocket after every run</h2>
+        <ol class="steps">
+          <li><b>Film 10–30 seconds of yourself riding.</b>A friend's phone from the side of the trail is all it takes.</li>
+          <li><b>Upload the clip.</b>The AI looks at your stance, balance, edging and turn shape frame by frame.</li>
+          <li><b>Get 2–3 fixes, ranked.</b>Each one comes with a drill and a short cue to think about on your next run.</li>
+        </ol>
+        <div class="btnrow"><a class="btn primary" href="#coach">Analyze a run</a></div>
+      </div>
+      <div class="sample-card" aria-label="Example coaching result">
+        <span class="pill warn" style="justify-self:start">Example result</span>
+        <h3>1 · Weight in the back seat</h3>
+        <p>Leaning back takes pressure off your tips, so you skid instead of grip.</p>
+        <p style="color:var(--ink)"><b>Drill:</b> On a green, press both shins into your boot tongues for the whole run.</p>
+        <span class="cue">Think: “Shins forward”</span>
+      </div>
+    </section>
+
+    <section class="sect">
+      <h2>Built for weekend riders</h2>
+      <p>Chairlift is for college students and young skiers and snowboarders who ride mid-size mountains like Holiday Valley, Seven Springs and Killington on weekends, want to keep improving, and can't spend $100 on a lesson every time they go out.</p>
+      <div class="feat">
+        <div><b>Mountain status</b><p>Open runs and lifts, lift and lodge hours, and snow conditions for 57 mountains.</p></div>
+        <div><b>Run &amp; season tracking</b><p>GPS speed, automatic run counting, and your days on snow and vertical for the season.</p></div>
+        <div class="hl"><b>AI Riding Coach</b><p>Technique feedback and drills from a phone video of your run.</p></div>
+        <div><b>Mountain reviews</b><p>Rate mountains on five stars and read what other riders say.</p></div>
+      </div>
+    </section>
+
+    <section class="sect">
+      <h2>Why it's worth paying for</h2>
+      <div class="vs">
+        <div><span>One group lesson</span><b>$100+</b><p style="margin:0;color:var(--muted)">For one hour, one day.</p></div>
+        <div class="win"><span>Chairlift Pro</span><b>$4.99/mo</b><p style="margin:0;color:var(--muted)">Feedback after every run, all season long.</p></div>
+      </div>
+      <div class="plans">
+        <div class="plan"><h3>Free</h3><div class="price">$0</div>
+          <ul><li>Mountain status for 57 mountains</li><li>Run, speed and season tracking</li><li>Mountain reviews</li><li>1 AI coach analysis a month</li></ul>
+          <a class="btn" href="#account" data-go="signup">Create a free account</a></div>
+        <div class="plan pro"><h3>Pro <span class="probadge">Best value</span></h3><div class="price">$4.99<small>per month</small></div>
+          <ul><li>Everything in Free</li><li>Unlimited AI coach analyses</li><li>Coaching history saved to your account</li><li>Cancel anytime</li></ul>
+          <button class="btn primary" type="button" data-go="upgrade">Get Chairlift Pro</button></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ACCOUNT VIEW -->
+  <div id="view-account" class="view" hidden style="display:grid;gap:16px">
+    <div class="hero"><h1 id="acctTitle">Log in or sign up</h1></div>
+    <div class="grid2">
+      <section class="panel" id="authPanel">
+        <div class="seg"><button type="button" id="modeLogin" aria-pressed="true">Log in</button><button type="button" id="modeSignup" aria-pressed="false">Create account</button></div>
+        <form id="authForm" novalidate>
+          <div class="field" id="nameField" hidden><label for="authName">First name</label><input id="authName" autocomplete="given-name" maxlength="60"></div>
+          <div class="field"><label for="authEmail">Email</label><input id="authEmail" type="email" autocomplete="email" maxlength="200"></div>
+          <div class="field"><label for="authPass">Password</label><input id="authPass" type="password" autocomplete="current-password"><small class="notice" id="passHint" hidden>At least 8 characters.</small></div>
+          <div class="btnrow" style="margin-top:4px"><button class="btn primary" type="submit" id="authGo">Log in</button></div>
+          <p class="msg" id="authMsg"></p>
+        </form>
+      </section>
+      <section class="panel" id="whyPanel">
+        <h2>What your account saves</h2>
+        <ul class="goodlist"><li>Your days on snow, runs and top speeds, on every device</li><li>Your AI coaching history and the cues to remember</li><li>Your mountain reviews</li></ul>
+        <p class="msg">Free accounts get 1 AI coach analysis a month. Pro is unlimited for $4.99 a month.</p>
+      </section>
+      <section class="panel" id="mePanel" hidden>
+        <h2>Signed in <small id="meEmail"></small></h2>
+        <div id="meBox">
+          <div class="planrow" id="mePlan"></div>
+          <p class="msg" id="meQuota" style="margin:0"></p>
+          <div class="btnrow"><button class="btn primary" type="button" id="upgradeBtn">Upgrade to Pro · $4.99/mo</button><button class="btn" type="button" id="logoutBtn">Log out</button></div>
+          <p class="msg" id="meMsg"></p>
+        </div>
+      </section>
+      <section class="panel" id="planPanel" hidden>
+        <h2 id="planTitle">Chairlift Pro</h2>
+        <ul class="goodlist"><li>Unlimited AI coach analyses</li><li>Coaching history saved to your account</li><li>Cancel anytime</li></ul>
+        <p class="msg" id="planNote">Payments are handled securely by Stripe.</p>
+      </section>
     </div>
-    <div class="about-by"><span>Created by</span><b>Zach Watson</b></div>
-  </section>
+  </div>
+
   <!-- MOUNTAIN VIEW -->
-  <div id="view-mountain" class="view" style="display:grid;gap:16px">
+  <div id="view-mountain" class="view" hidden style="display:grid;gap:16px">
     <div class="hero">
       <h1 id="mName"></h1>
       <div class="sub" id="mSub"></div>
@@ -305,6 +439,8 @@ footer.credit b{font:800 18px/1 var(--display);letter-spacing:.05em;text-transfo
             <textarea id="coachGoal" maxlength="300" placeholder="e.g. I end up in the back seat on steeper runs"></textarea></div>
           <div class="btnrow"><button class="btn primary" type="submit" id="coachGo">Analyze my run</button><button class="btn" type="button" id="coachStop" hidden>Stop</button></div>
           <p class="msg" id="coachMsg">Film from 10–30 feet away with the rider filling most of the frame.</p>
+          <div class="btnrow" id="coachCta" hidden></div>
+          <p class="quota" id="coachQuota"></p>
         </form>
       </section>
       <section class="panel">
@@ -313,7 +449,7 @@ footer.credit b{font:800 18px/1 var(--display);letter-spacing:.05em;text-transfo
       </section>
     </div>
     <section class="panel">
-      <h2>Past sessions <small>saved on this device</small></h2>
+      <h2>Past sessions <small>saved to your account</small></h2>
       <div id="coachHist"></div>
     </section>
     <p class="notice">AI feedback is a guide, not a replacement for a certified instructor. Ride within your ability.</p>
@@ -467,8 +603,14 @@ let mtnId=ls.get("cl.mtn","holidayvalley");
 if(!MOUNTAINS.find(m=>m.id===mtnId))mtnId="holidayvalley";
 let runFilter="all";
 let season=ls.get("cl.season",{days:{}}); // days[date]={mtn,runs:[{top,vert,t}]}
-let reviews={}; // userId -> {items:{mtnId:{stars,text,ts}}}
-let db=null,user=null,myId=null,profiles={};
+let me=null,revCache={},revSummary={},coachHistServer=null;
+async function api(path,opts={}){
+  const init={credentials:"same-origin",method:opts.method||"GET",headers:{}};
+  if(opts.body!==undefined){init.headers["content-type"]="application/json";init.body=JSON.stringify(opts.body)}
+  const r=await fetch(path,init);let j={};try{j=await r.json()}catch(e){}
+  if(!r.ok){const e=new Error(j.message||"");e.code=j.error||"server";e.status=r.status;throw e}
+  return j;
+}
 const M=()=>MOUNTAINS.find(m=>m.id===mtnId);
 
 /* ---------- mountain view ---------- */
@@ -512,9 +654,10 @@ function setView(v){
   document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.view===v));
   document.querySelectorAll(".view").forEach(el=>el.hidden=el.id!=="view-"+v);
   try{if(location.hash!=="#"+v)history.replaceState(null,"","#"+v)}catch(e){}
+  window.scrollTo(0,0);
 }
 document.querySelectorAll("nav.tabs button").forEach(b=>b.onclick=()=>setView(b.dataset.view));
-window.addEventListener("hashchange",()=>{const v=location.hash.slice(1);if(["mountain","track","coach","reviews"].includes(v))setView(v)});
+window.addEventListener("hashchange",()=>{const v=location.hash.slice(1);if(["home","mountain","track","coach","reviews","account"].includes(v))setView(v)});
 $("#mtnSel").onchange=e=>{mtnId=e.target.value;ls.set("cl.mtn",mtnId);renderAll()};
 $("#runFilters").onclick=e=>{const b=e.target.closest(".chip");if(!b)return;runFilter=b.dataset.f;renderMountain()};
 
@@ -522,10 +665,10 @@ $("#runFilters").onclick=e=>{const b=e.target.closest(".chip");if(!b)return;runF
 let saveTimer=null;
 function persistSeason(){
   ls.set("cl.season",season);
-  if(!db||!myId){$("#seasonSave").textContent="Saved on this device";return}
+  if(!me){$("#seasonSave").textContent="Saved on this device · log in to keep it";return}
   clearTimeout(saveTimer);
   saveTimer=setTimeout(async()=>{
-    try{await db.doc("data/users/"+myId+"/season").set({days:season.days,updated:Date.now()});$("#seasonSave").textContent="Saved to your account"}
+    try{await api("/api/data",{method:"PUT",body:{season}});$("#seasonSave").textContent="Saved to your account"}
     catch(e){$("#seasonSave").textContent="Saved on this device"}
   },600);
 }
@@ -635,52 +778,52 @@ function stopLive(){
 $("#stopBtn").onclick=()=>{stopLive();$("#trackMsg").className="msg";$("#trackMsg").textContent="Tracking stopped. Your runs are saved."};
 
 /* ---------- reviews ---------- */
-function allReviewsFor(id){
-  return Object.entries(reviews).map(([uid,doc])=>{const r=doc?.items?.[id];return r&&r.stars?{uid,...r}:null}).filter(Boolean).sort((a,b)=>b.ts-a.ts);
+function allReviewsFor(id){return revCache[id]||[]}
+function avgFor(id){const x=revSummary[id];return x?{n:x.n,avg:x.avg}:{n:0,avg:0}}
+async function loadSummary(){try{revSummary=(await api("/api/reviews?summary=1")).summary||{};renderMountain();renderReviews()}catch(e){}}
+async function loadReviews(id){
+  try{revCache[id]=(await api("/api/reviews?mountain="+encodeURIComponent(id))).reviews||[];if(id===mtnId){renderReviews();loadMineIntoForm()}}
+  catch(e){if(id===mtnId)$("#revMsg").textContent=e.code==="no_db"?"Reviews will show up once the database is connected.":"Couldn't load reviews right now."}
 }
-function avgFor(id){const rs=allReviewsFor(id);return {n:rs.length,avg:rs.length?rs.reduce((a,r)=>a+r.stars,0)/rs.length:0}}
 let pick=0;
 function renderStarsPick(){
   $("#starPick").innerHTML=[1,2,3,4,5].map(i=>`<button type="button" role="radio" aria-checked="${pick===i}" aria-label="${i} star${i>1?"s":""}" data-s="${i}" class="${i<=pick?"on":""}">${starSvg(i<=pick)}</button>`).join("");
 }
 $("#starPick").onclick=e=>{const b=e.target.closest("button");if(!b)return;pick=+b.dataset.s;renderStarsPick()};
-async function renderReviews(){
+function renderReviews(){
   const m=M();$("#rName").textContent=m.name;
-  const rs=allReviewsFor(m.id),a=avgFor(m.id);
+  const rs=allReviewsFor(m.id);
+  const a=rs.length?{n:rs.length,avg:rs.reduce((x,r)=>x+r.stars,0)/rs.length}:avgFor(m.id);
   const dist=[5,4,3,2,1].map(s=>rs.filter(r=>r.stars===s).length);
   $("#ratingSum").innerHTML=`<div><div class="avg">${a.n?a.avg.toFixed(1):"–"}</div>${starsHtml(a.avg)}<div class="notice">${a.n} rating${a.n===1?"":"s"}</div></div>
    <div class="bars">${[5,4,3,2,1].map((s,i)=>`<div><span>${s}★</span><span class="b"><i style="width:${a.n?dist[i]/a.n*100:0}%"></i></span><span>${dist[i]}</span></div>`).join("")}</div>`;
   $("#revCount").textContent=rs.length?rs.length+" posted":"";
-  const mine=myId&&reviews[myId]?.items?.[m.id];
+  const mine=rs.find(r=>r.mine);
   $("#formTitle").textContent=mine?"Your review":"Rate "+m.name;
   $("#revDelete").hidden=!mine;
-  $("#revSubmit").textContent=mine?"Update review":"Post review";
-  if(!db){$("#revSubmit").disabled=true;$("#revMsg").textContent="Reviews are coming soon. Posting needs a shared database, which this site doesn't have yet.";}
+  $("#revSubmit").textContent=me?(mine?"Update review":"Post review"):"Log in to post";
+  $("#revSubmit").disabled=false;
   if(!rs.length){$("#revList").innerHTML=`<div class="empty">No reviews of ${esc(m.name)} yet. Pick your stars and tell people how the day went.</div>`;return}
-  const ids=rs.map(r=>r.uid);
-  if(user){try{Object.assign(profiles,await user.profiles(ids))}catch(e){}}
   $("#revList").innerHTML=rs.map(r=>`<div class="review"><div class="who"><b></b>${starsHtml(r.stars)}</div>${r.text?`<p></p>`:""}<div class="meta">${new Date(r.ts).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"})}${r.days?` · ${r.days} day${r.days>1?"s":""} on snow this season`:""}</div></div>`).join("");
-  [...$("#revList").children].forEach((el,i)=>{const r=rs[i];el.querySelector("b").textContent=(profiles[r.uid]?.name||"A rider")+(r.uid===myId?" (you)":"");const p=el.querySelector("p");if(p)p.textContent=r.text});
+  [...$("#revList").children].forEach((el,i)=>{const r=rs[i];el.querySelector("b").textContent=r.name+(r.mine?" (you)":"");const p=el.querySelector("p");if(p)p.textContent=r.text});
 }
 function loadMineIntoForm(){
-  const mine=myId&&reviews[myId]?.items?.[mtnId];
+  const mine=allReviewsFor(mtnId).find(r=>r.mine);
   pick=mine?mine.stars:0;$("#revText").value=mine?mine.text:"";renderStarsPick();
 }
 $("#revForm").onsubmit=async e=>{
   e.preventDefault();
-  if(!db||!myId){$("#revMsg").textContent="Reviews are coming soon.";return}
+  if(!me){setAuthMode("login");setView("account");$("#authMsg").textContent="Log in or create a free account to post a review.";return}
   if(!pick){$("#revMsg").textContent="Pick 1 to 5 stars first.";return}
-  const daysCount=Object.values(season.days).filter(d=>d.runs.length||d.checked).length;
-  const items={...(reviews[myId]?.items||{})};
-  items[mtnId]={stars:pick,text:$("#revText").value.trim().slice(0,1500),ts:Date.now(),days:daysCount};
+  const days=Object.values(season.days).filter(d=>d.runs.length||d.checked).length;
   $("#revSubmit").disabled=true;
-  try{await db.doc("reviews/"+myId).set({items});$("#revMsg").textContent="Posted."}
-  catch(err){$("#revMsg").textContent=err?.code==="not_granted"?"You have view-only access to this page, so you can read reviews but not post.":"Couldn't post right now. Try again in a moment."}
+  try{await api("/api/reviews",{method:"POST",body:{mountain:mtnId,stars:pick,text:$("#revText").value.trim().slice(0,1500),days}});$("#revMsg").textContent="Posted.";await loadReviews(mtnId);loadSummary()}
+  catch(err){$("#revMsg").textContent=err.code==="login_required"?"Your session ended. Log in again to post.":"Couldn't post right now. Try again in a moment."}
   $("#revSubmit").disabled=false;
 };
 $("#revDelete").onclick=async()=>{
-  if(!db||!myId)return;const items={...(reviews[myId]?.items||{})};delete items[mtnId];
-  try{await db.doc("reviews/"+myId).set({items});$("#revMsg").textContent="Your review was removed.";pick=0;$("#revText").value="";renderStarsPick()}
+  if(!me)return;
+  try{await api("/api/reviews?mountain="+encodeURIComponent(mtnId),{method:"DELETE"});$("#revMsg").textContent="Your review was removed.";pick=0;$("#revText").value="";renderStarsPick();await loadReviews(mtnId);loadSummary()}
   catch(e){$("#revMsg").textContent="Couldn't remove it right now."}
 };
 
@@ -727,23 +870,18 @@ async function framesFromImages(files){
 }
 const b64=b=>new Promise((ok,bad)=>{const r=new FileReader();r.onload=()=>ok(String(r.result).split(",")[1]);r.onerror=bad;r.readAsDataURL(b)});
 async function runCoach(ctx,blobs,signal){
-  if(window.claude?.use){
-    const sample=await claude.use("sample");
-    if(sample){
-      const caps=await sample.limits().catch(()=>null);
-      const max=caps?.images?.maxCount||blobs.length;
-      return await sample.json(coachPrompt(ctx),{images:blobs.slice(0,Math.min(6,max)),modelTier:"default",signal});
-    }
-  }
   const images=await Promise.all(blobs.slice(0,6).map(b64));
-  const r=await fetch("/api/coach",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({...ctx,images}),signal});
+  const r=await fetch("/api/coach",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:JSON.stringify({...ctx,images}),signal});
   const j=await r.json().catch(()=>({}));
   if(!r.ok)throw {code:j.error||"server",message:j.message||""};
-  return j.result;
+  return j;
 }
 function coachErr(e){
   const c=e?.code||e?.message;
-  return ({not_granted:"You declined letting this page use AI, so the coach can't run. Reload the page to be asked again.",
+  return ({login_required:"Log in or create a free account to analyze your run. Free accounts get 1 analysis a month.",
+    upgrade_needed:"You've used your free analysis for this month. Chairlift Pro gives you unlimited analyses for $4.99 a month.",
+    no_db:"Accounts aren't connected yet, so the coach can't run. The site owner needs to connect the database.",
+    not_granted:"You declined letting this page use AI, so the coach can't run. Reload the page to be asked again.",
     rate_limited:"Too many analyses at once. Wait a minute, then try again.",
     missing_key:"The coach isn't switched on for this site yet. The site owner needs to add an AI API key.",
     images_unavailable:"This view can't send images to the AI. Open the page in a browser to use the coach.",
@@ -767,7 +905,8 @@ function renderCoachResult(r,{example=false,when=""}={}){
    ${r.limits?`<p class="msg">${esc(r.limits)}</p>`:""}`;
 }
 function renderCoachHist(){
-  const h=ls.get("cl.coach",[]);
+  if(!me){$("#coachHist").innerHTML=`<div class="empty">Log in to see your coaching history.</div>`;return}
+  const h=coachHistServer||[];
   $("#coachHist").innerHTML=h.length?h.map(x=>`<div class="hist"><b>${esc(x.run)} · ${esc(x.mtn)}</b><span class="meta">${new Date(x.ts).toLocaleDateString(undefined,{month:"short",day:"numeric"})}</span><p>${esc(x.level||"")}${x.level?" — ":""}${esc((x.cues||[]).join(" · "))}</p></div>`).join("")
     :`<div class="empty">Your analyzed runs show up here with the cues to remember on the lift.</div>`;
 }
@@ -795,48 +934,127 @@ $("#coachStop").onclick=()=>coach.ctl?.abort();
 $("#coachForm").onsubmit=async e=>{
   e.preventDefault();if(coach.busy)return;
   if(coach.frames.length<2){coachMsg("Choose a video or a few photos of your run first.",true);return}
+  coachCta(null);
+  if(!me){coachMsg(coachErr({code:"login_required"}),true);coachCta("login_required");return}
+  if(me.coachLeft===0){coachMsg(coachErr({code:"upgrade_needed"}),true);coachCta("upgrade_needed");return}
   const ctx={sport:$("#coachSport").value,level:$("#coachLevel").value,run:$("#coachRun").value,mtn:M().name,goal:$("#coachGoal").value.trim().slice(0,300),speed:topToday(),gap:(coach.gap||1).toFixed(1)};
   coach.busy=true;coach.ctl=new AbortController();$("#coachGo").disabled=true;$("#coachStop").hidden=false;
   coachMsg("Analyzing your run. This usually takes 10–40 seconds…");
   try{
-    const r=await runCoach(ctx,coach.frames,coach.ctl.signal);
+    const j=await runCoach(ctx,coach.frames,coach.ctl.signal);
+    const r=j&&j.result;
+    if(me&&j){if("coachLeft" in j)me.coachLeft=j.coachLeft;if(j.history)coachHistServer=j.history;renderMe()}
     if(!r||typeof r!=="object")throw {code:"server"};
     coach.real=true;renderCoachResult(r,{when:"Just now · "+ctx.mtn});
-    if(r.visible!==false){const h=ls.get("cl.coach",[]);h.unshift({ts:Date.now(),mtn:ctx.mtn,run:ctx.run,level:r.level||"",cues:(Array.isArray(r.fixes)?r.fixes:[]).map(f=>f.cue).filter(Boolean).slice(0,3)});ls.set("cl.coach",h.slice(0,8));renderCoachHist()}
+    renderCoachHist();
     coachMsg("Done. Work on fix #1 first.");
   }catch(err){
     if(err?.code==="cancelled"||err?.name==="AbortError")coachMsg("Stopped.");
-    else coachMsg(coachErr(err),true);
+    else{coachMsg(coachErr(err),true);coachCta(err&&err.code)}
   }finally{coach.busy=false;$("#coachGo").disabled=false;$("#coachStop").hidden=true}
 };
 
 /* ---------- boot ---------- */
-function renderAll(){renderPicker();renderMountain();renderTrack();renderReviews();loadMineIntoForm();renderCoach()}
+function renderAll(){renderPicker();renderMountain();renderTrack();renderReviews();loadMineIntoForm();renderCoach();if(typeof revCache!=="undefined"&&!revCache[mtnId]&&typeof api==="function")loadReviews(mtnId)}
 renderAll();
-{const v=location.hash.slice(1);setView(["mountain","track","coach","reviews"].includes(v)?v:"mountain")}
-$("#seasonSave").textContent="Saved on this device";
+{const v=location.hash.slice(1);setView(["home","mountain","track","coach","reviews","account"].includes(v)?v:"home")}
 
-(async()=>{
-  if(!window.claude?.use)return;
+/* ---------- accounts & payments ---------- */
+let authMode="login";
+function setAuthMode(m){
+  authMode=m;$("#modeLogin").setAttribute("aria-pressed",m==="login");$("#modeSignup").setAttribute("aria-pressed",m==="signup");
+  $("#nameField").hidden=m!=="signup";$("#passHint").hidden=m!=="signup";
+  $("#authGo").textContent=m==="signup"?"Create account":"Log in";
+  $("#authPass").setAttribute("autocomplete",m==="signup"?"new-password":"current-password");$("#authMsg").textContent="";$("#authMsg").className="msg";
+}
+$("#modeLogin").onclick=()=>setAuthMode("login");
+$("#modeSignup").onclick=()=>setAuthMode("signup");
+function firstName(u){return (u.name||u.email.split("@")[0]).split(" ")[0]}
+function coachCta(code){
+  const el=$("#coachCta");
+  if(code==="login_required"){el.innerHTML=`<a class="btn primary" href="#account" data-go="signup">Create a free account</a><a class="btn" href="#account" data-go="login">Log in</a>`;el.hidden=false}
+  else if(code==="upgrade_needed"){el.innerHTML=`<button class="btn primary" type="button" data-go="upgrade">Upgrade to Pro · $4.99/mo</button>`;el.hidden=false}
+  else{el.innerHTML="";el.hidden=true}
+}
+function renderMe(){
+  const b=$("#acctBtn");
+  if(me){b.innerHTML=esc(firstName(me))+(me.isPro?' <span class="probadge">Pro</span>':"")}else b.textContent="Log in";
+  $("#authPanel").hidden=!!me;$("#whyPanel").hidden=!!me;$("#mePanel").hidden=!me;$("#planPanel").hidden=!me;
+  $("#acctTitle").textContent=me?"Hi, "+firstName(me):"Log in or sign up";
+  if(me){
+    $("#meEmail").textContent=me.email;
+    $("#mePlan").innerHTML=me.isPro?`<span class="pill ok"><span class="dot"></span>Chairlift Pro</span>`:`<span class="pill">Free plan</span>`;
+    $("#meQuota").textContent=me.isPro?"Unlimited AI coach analyses.":`${me.coachLeft} of ${me.freePerMonth} free AI coach analysis left this month.`;
+    $("#upgradeBtn").hidden=!!me.isPro;
+    $("#planTitle").textContent=me.isPro?"You're on Chairlift Pro":"Chairlift Pro · $4.99/mo";
+    $("#planNote").textContent=me.isPro?(me.proSince?"Member since "+new Date(me.proSince).toLocaleDateString(undefined,{month:"long",day:"numeric",year:"numeric"})+".":"Thanks for supporting Chairlift."):"Payments are handled securely by Stripe.";
+  }
+  $("#coachQuota").textContent=!me?"Log in to analyze a run. Free accounts get 1 analysis a month.":me.isPro?"Pro · unlimited analyses":`Free plan · ${me.coachLeft} analysis left this month`;
+  if(!me)$("#seasonSave").textContent="Saved on this device · log in to keep it";
+  renderReviews();renderCoachHist();
+}
+function meMsg(t,err){$("#meMsg").textContent=t;$("#meMsg").className="msg"+(err?" err":"")}
+async function loadMe(){
+  try{me=(await api("/api/auth")).user}catch(e){me=null}
+  renderMe();
+  if(!me)return;
   try{
-    [db,user]=await Promise.all([claude.use("db"),claude.use("user")]);
-    if(user){try{myId=await user.id()}catch(e){}}
-    if(!db)return renderReviews();
-    $("#revSubmit").disabled=false;$("#revMsg").textContent="";
-    let got=false;const timer=setTimeout(()=>{if(!got)$("#revMsg").textContent="Reviews are taking a while to load."},10000);
-    db.collection("reviews").onSnapshot(s=>{got=true;clearTimeout(timer);reviews={};s.docs.forEach(d=>reviews[d.id]=d.data());renderMountain();renderReviews();loadMineIntoForm()},()=>{got=true;clearTimeout(timer);$("#revMsg").textContent="Couldn't load reviews right now."});
-    if(myId){
-      try{const snap=await db.doc("data/users/"+myId+"/season").get();
-        if(snap.exists){const remote=snap.data().days||{};
-          // merge: keep the version of each day with more runs
-          for(const[k,v]of Object.entries(remote)){const l=season.days[k];if(!l||(v.runs||[]).length>=(l.runs||[]).length)season.days[k]=v}
-          ls.set("cl.season",season);$("#seasonSave").textContent="Saved to your account";renderTrack();
-        }else if(Object.keys(season.days).length)persistSeason();
-        else $("#seasonSave").textContent="Saved to your account";
-      }catch(e){}
-    }
+    const d=await api("/api/data");
+    const remote=(d.season&&d.season.days)||{};
+    for(const[k,v]of Object.entries(remote)){const l=season.days[k];if(!l||(v.runs||[]).length>=(l.runs||[]).length)season.days[k]=v}
+    coachHistServer=d.coachHistory||[];
+    ls.set("cl.season",season);renderTrack();renderCoachHist();
+    if(Object.keys(season.days).length)persistSeason();else $("#seasonSave").textContent="Saved to your account";
   }catch(e){}
-})();
+  loadReviews(mtnId);
+}
+$("#authForm").onsubmit=async e=>{
+  e.preventDefault();
+  const email=$("#authEmail").value.trim(),password=$("#authPass").value,name=$("#authName").value.trim();
+  const msg=(t,err)=>{$("#authMsg").textContent=t;$("#authMsg").className="msg"+(err?" err":"")};
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return msg("Enter a valid email address.",true);
+  if(authMode==="signup"&&password.length<8)return msg("Use at least 8 characters for your password.",true);
+  if(!password)return msg("Enter your password.",true);
+  $("#authGo").disabled=true;msg(authMode==="signup"?"Creating your account…":"Logging in…");
+  try{
+    const j=await api("/api/auth",{method:"POST",body:{action:authMode,name,email,password}});
+    $("#authPass").value="";
+    await loadMe();
+    meMsg(authMode==="signup"?"Your account is ready. Head to the Coach tab to analyze your first run.":"Welcome back.");
+  }catch(err){
+    msg(err.code==="no_db"?"Accounts aren't connected yet. The site owner needs to connect the database.":err.message||"Couldn't reach the server. Check your connection and try again.",true);
+  }finally{$("#authGo").disabled=false}
+};
+$("#logoutBtn").onclick=async()=>{
+  try{await api("/api/auth",{method:"POST",body:{action:"logout"}})}catch(e){}
+  me=null;coachHistServer=null;revCache={};setAuthMode("login");renderMe();loadReviews(mtnId);
+  $("#authMsg").textContent="You're logged out.";
+};
+async function startCheckout(){
+  if(!me){setAuthMode("signup");setView("account");$("#authMsg").textContent="Create a free account first, then you can upgrade to Pro.";return}
+  if(me.isPro){setView("account");meMsg("You already have Chairlift Pro.");return}
+  setView("account");meMsg("Opening secure checkout…");
+  try{const j=await api("/api/checkout",{method:"POST",body:{}});location.href=j.url}
+  catch(e){meMsg(e.code==="no_stripe"?"Payments aren't switched on for this site yet.":e.message||"Couldn't start checkout. Try again.",true)}
+}
+$("#upgradeBtn").onclick=startCheckout;
+document.addEventListener("click",e=>{
+  const a=e.target.closest("[data-go]");if(!a)return;
+  const g=a.dataset.go;
+  if(g==="upgrade"){e.preventDefault();startCheckout()}
+  else if(g==="signup"||g==="login"){setAuthMode(g)}
+});
+async function handleCheckoutReturn(){
+  const p=new URLSearchParams(location.search),st=p.get("checkout");if(!st)return;
+  const id=p.get("session_id");
+  try{history.replaceState(null,"",location.pathname+"#account")}catch(e){}
+  setView("account");
+  if(st==="cancel"){meMsg("Checkout canceled. You weren't charged.");return}
+  meMsg("Confirming your payment…");
+  try{me=(await api("/api/checkout?session_id="+encodeURIComponent(id||""))).user;renderMe();meMsg("Payment received. Chairlift Pro is on, with unlimited AI coach analyses.")}
+  catch(e){meMsg(e.message||"We couldn't confirm that payment.",true)}
+}
+(async()=>{await loadMe();await handleCheckoutReturn();loadSummary();if(!revCache[mtnId])loadReviews(mtnId)})();
 </script>
 
 </body>
