@@ -1,0 +1,843 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Chairlift by Zach Watson: mountain conditions, run tracking and reviews for skiers and snowboarders.">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Chairlift</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: a trail-map signboard. Sticky mountain bar, three tabs, one column of panels on phone, two on wide screens. */
+:root{
+  --bg:#eef2f4; --panel:#ffffff; --ink:#14212b; --muted:#5b6b77; --line:#d6dee3;
+  --spruce:#1f4b44; --accent:#e2561f; --accent-ink:#ffffff;
+  --green:#2f8a3e; --blue:#1d5fbf; --black:#14212b;
+  --ok:#2f8a3e; --warn:#b7791f; --bad:#b83a2c; --soft:#e4ebee;
+  --display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e161c; --panel:#16222a; --ink:#e6edf1; --muted:#93a4b0; --line:#273641;
+  --spruce:#7fc2b4; --accent:#ff7a45; --accent-ink:#1a0d06;
+  --green:#5cc26c; --blue:#6aa6ff; --black:#e6edf1;
+  --ok:#5cc26c; --warn:#e3b04b; --bad:#ff7466; --soft:#1e2d36; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e161c; --panel:#16222a; --ink:#e6edf1; --muted:#93a4b0; --line:#273641;
+  --spruce:#7fc2b4; --accent:#ff7a45; --accent-ink:#1a0d06;
+  --green:#5cc26c; --blue:#6aa6ff; --black:#e6edf1;
+  --ok:#5cc26c; --warn:#e3b04b; --bad:#ff7466; --soft:#1e2d36; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--body);margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--spruce)}
+.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--spruce);color:#fff}
+:root:not([data-theme="light"]) header.top{color:#fff}
+.brandrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:12px 8px}
+.brand{font:800 26px/1 var(--display);letter-spacing:.04em;text-transform:uppercase;color:#fff}
+.brand span{color:#ffb38f}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) header.top{background:#12302b}}
+:root[data-theme="dark"] header.top{background:#12302b}
+.pick{display:flex;align-items:center;gap:8px;min-width:0}
+.pick label{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#cfe3de}
+.pick select{font:600 15px var(--body);padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.12);color:#fff;max-width:56vw}
+.pick select option{color:#14212b}
+nav.tabs{display:flex;gap:4px;padding-block:0}
+nav.tabs button{flex:1;font:800 17px/1 var(--display);letter-spacing:.06em;text-transform:uppercase;background:none;border:0;color:#cfe3de;padding:12px 4px 13px;border-bottom:3px solid transparent;cursor:pointer}
+nav.tabs button[aria-selected="true"]{color:#fff;border-bottom-color:#ff8a5c}
+nav.tabs button:focus-visible{outline:2px solid #fff;outline-offset:-2px}
+main{padding-block:18px 48px;display:grid;gap:16px}
+.notice{font:500 12px var(--mono);color:var(--muted);letter-spacing:.02em}
+.hero{display:grid;gap:6px}
+.hero h1{font:800 clamp(34px,7vw,56px)/.95 var(--display);text-transform:uppercase;letter-spacing:.01em;margin:0;text-wrap:balance}
+.hero .sub{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;color:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:6px;font:600 12px var(--body);padding:3px 10px;border-radius:99px;background:var(--soft);color:var(--ink);white-space:nowrap}
+.pill.ok{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.pill.warn{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.pill.bad{background:color-mix(in srgb,var(--bad) 14%,transparent);color:var(--bad)}
+.dot{width:8px;height:8px;border-radius:50%;background:currentColor}
+.grid2{display:grid;gap:16px;grid-template-columns:1fr}
+@media(min-width:820px){.grid2{grid-template-columns:1fr 1fr}}
+section.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+.panel h2{font:800 20px/1 var(--display);text-transform:uppercase;letter-spacing:.05em;margin:0 0 12px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.panel h2 small{font:500 12px var(--mono);letter-spacing:.02em;text-transform:none;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.stat{background:var(--panel);padding:12px}
+.stat b{display:block;font:800 30px/1 var(--display);font-variant-numeric:tabular-nums}
+.stat b em{font-style:normal;font-size:16px;color:var(--muted);margin-left:2px}
+.stat span{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.chip{font:600 13px var(--body);padding:5px 12px;border-radius:99px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+ul.rows{list-style:none;margin:0;padding:0}
+ul.rows li{display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+ul.rows li:first-child{border-top:0}
+ul.rows li.closed .nm{color:var(--muted)}
+.nm{font-weight:600;min-width:0}
+.nm small{display:block;font:400 12px var(--body);color:var(--muted)}
+.sym{width:16px;height:16px;display:block}
+.status{font:600 12px var(--mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.status.open{color:var(--ok)}.status.closed{color:var(--muted)}.status.hold{color:var(--warn)}
+.hours{display:grid;grid-template-columns:1fr auto;gap:0;font-variant-numeric:tabular-nums}
+.hours div{padding:8px 0;border-top:1px solid var(--line)}
+.hours div:nth-child(-n+2){border-top:0}
+.hours .t{text-align:right;font:500 13px var(--mono);white-space:nowrap}
+.hours .k{font-weight:600}
+.hours .k small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.cond{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.cond div span{display:block;font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.cond div b{font:800 24px/1.1 var(--display);font-variant-numeric:tabular-nums}
+.snowbar{height:10px;border-radius:5px;background:var(--soft);overflow:hidden;margin-top:6px}
+.snowbar i{display:block;height:100%;background:var(--blue)}
+.btn{font:600 15px var(--body);padding:11px 16px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.small{padding:7px 12px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.speedo{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.speedo .big{font:800 clamp(64px,16vw,104px)/.85 var(--display);font-variant-numeric:tabular-nums}
+.speedo .big em{font-size:24px;font-style:normal;color:var(--muted);margin-left:4px}
+.live{font:500 12px var(--mono);color:var(--muted)}
+.msg{font-size:13px;color:var(--muted);margin:10px 0 0}
+.msg.err{color:var(--bad)}
+form.inline{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;align-items:end;margin-top:12px}
+.field{display:grid;gap:4px;min-width:0}
+.field label{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+input,select.f,textarea{font:15px var(--body);padding:9px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+textarea{min-height:96px;resize:vertical}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.tablewrap{overflow-x:auto}
+th{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;padding:6px 8px 6px 0;border-bottom:1px solid var(--line)}
+td{padding:8px 8px 8px 0;border-bottom:1px solid var(--line);white-space:nowrap}
+td.num,th.num{text-align:right}
+.cal{display:grid;grid-template-columns:repeat(auto-fill,minmax(14px,1fr));gap:3px;margin-top:12px}
+.cal i{aspect-ratio:1;border-radius:3px;background:var(--soft);max-width:100%}
+.cal i.on{background:var(--accent)}
+.cal i.today{outline:2px solid var(--ink);outline-offset:-2px}
+.calkey{display:flex;justify-content:space-between;font:500 11px var(--mono);color:var(--muted);margin-top:6px}
+.stars{display:inline-flex;gap:2px;color:var(--accent)}
+.stars svg{width:18px;height:18px}
+.starpick{display:flex;gap:4px}
+.starpick button{background:none;border:0;padding:2px;cursor:pointer;color:var(--line)}
+.starpick button.on{color:var(--accent)}
+.starpick svg{width:32px;height:32px}
+.review{padding:14px 0;border-top:1px solid var(--line);display:grid;gap:6px}
+.review:first-child{border-top:0;padding-top:0}
+.review .who{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center}
+.review .who b{font-weight:600}
+.review p{margin:0;max-width:65ch;white-space:pre-wrap;overflow-wrap:anywhere}
+.review .meta{font:500 12px var(--mono);color:var(--muted)}
+.ratingsum{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.ratingsum .avg{font:800 56px/1 var(--display)}
+.bars{flex:1;min-width:180px;display:grid;gap:4px}
+.bars div{display:grid;grid-template-columns:28px 1fr 28px;gap:8px;align-items:center;font:500 12px var(--mono);color:var(--muted)}
+.bars span.b{height:8px;border-radius:4px;background:var(--soft);overflow:hidden}
+.bars span.b i{display:block;height:100%;background:var(--accent)}
+.about{display:grid;grid-template-columns:1fr auto;gap:12px 24px;align-items:end;padding-block:4px 16px;border-bottom:1px solid var(--line)}
+@media(max-width:640px){.about{grid-template-columns:1fr}}
+.about-text{min-width:0}
+.about .eyebrow{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0 0 4px}
+.about h2{font:800 24px/1.05 var(--display);text-transform:uppercase;letter-spacing:.03em;margin:0 0 6px;text-wrap:balance}
+.about p{margin:0;max-width:68ch;color:var(--muted)}
+.about-by{display:grid;gap:2px;text-align:right}
+@media(max-width:640px){.about-by{text-align:left}}
+.about-by span{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.about-by b{font:800 26px/1 var(--display);letter-spacing:.04em;text-transform:uppercase}
+.empty{color:var(--muted);padding:12px 0}
+.byline{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#cfe3de;margin-top:3px}
+footer.credit{padding-block:20px 32px;border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;color:var(--muted);font-size:13px}
+footer.credit b{font:800 18px/1 var(--display);letter-spacing:.05em;text-transform:uppercase;color:var(--ink)}
+.drop{display:grid;gap:2px;place-items:center;text-align:center;padding:22px 12px;border:2px dashed var(--line);border-radius:10px;cursor:pointer;background:var(--bg)}
+.drop:hover{border-color:var(--accent)}
+.drop b{font:800 20px/1.1 var(--display);text-transform:uppercase;letter-spacing:.04em;color:var(--accent)}
+.drop span{color:var(--muted);font-size:13px}
+.drop .fname{font:500 12px var(--mono);color:var(--ink);overflow-wrap:anywhere}
+.frames{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:6px;margin-top:10px}
+.frames img{width:100%;max-width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:6px;display:block}
+.row3{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:12px}
+.verdict{font-size:17px;margin:8px 0 0;max-width:60ch}
+.mini{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:16px 0 4px}
+.goodlist{margin:0;padding-left:18px}
+.fix{display:grid;gap:4px;padding:12px 0;border-top:1px solid var(--line)}
+.fix h3{font:800 19px/1.1 var(--display);text-transform:uppercase;letter-spacing:.03em;margin:0;display:flex;gap:10px;align-items:baseline}
+.fix h3 i{font:500 12px var(--mono);font-style:normal;color:var(--accent)}
+.fix p{margin:0;color:var(--muted);max-width:62ch}
+.fix p.drill{color:var(--ink)}
+.cue{justify-self:start;font:500 12px var(--mono);background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent);padding:3px 8px;border-radius:6px}
+.nextrun{background:var(--soft);border-radius:10px;padding:12px;margin-top:12px}
+.nextrun span{display:block;font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.hist{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:10px 0;border-top:1px solid var(--line)}
+.hist:first-child{border-top:0}
+.hist b{font-weight:600}
+.hist p{margin:0;grid-column:1/-1;color:var(--muted);font-size:14px}
+.hist .meta{font:500 12px var(--mono);color:var(--muted);white-space:nowrap}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+
+<header class="top">
+  <div class="wrap">
+    <div class="brandrow">
+      <div><div class="brand">Chair<span>lift</span></div><div class="byline">by Zach Watson</div></div>
+      <div class="pick"><label for="mtnSel">I'm at</label><select id="mtnSel"></select></div>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button role="tab" id="tab-mountain" aria-selected="true" data-view="mountain">Mountain</button>
+      <button role="tab" id="tab-track" aria-selected="false" data-view="track">My Day</button>
+      <button role="tab" id="tab-coach" aria-selected="false" data-view="coach">Coach</button>
+      <button role="tab" id="tab-reviews" aria-selected="false" data-view="reviews">Reviews</button>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+<main>
+  <section class="about" aria-labelledby="aboutTitle">
+    <div class="about-text">
+      <p class="eyebrow">About Chairlift</p>
+      <h2 id="aboutTitle">One app for your whole day on the mountain</h2>
+      <p>Chairlift is a mobile web app for skiers and snowboarders. Pick the mountain you're at to see which runs and lifts are open, when the lifts and lodges open and close, and today's snow and weather conditions. Track your speed and runs as you ride and count your days on snow across the season. The AI Riding Coach turns a short phone video of your run into a technique breakdown with drills for your next run, and you can rate and review mountains on a five-star scale.</p>
+    </div>
+    <div class="about-by"><span>Created by</span><b>Zach Watson</b></div>
+  </section>
+  <!-- MOUNTAIN VIEW -->
+  <div id="view-mountain" class="view" style="display:grid;gap:16px">
+    <div class="hero">
+      <h1 id="mName"></h1>
+      <div class="sub" id="mSub"></div>
+      <div class="notice">Example conditions. Live resort feeds are not connected yet.</div>
+    </div>
+    <div class="stats" id="mStats"></div>
+    <div class="grid2">
+      <section class="panel">
+        <h2>Runs <small id="runCount"></small></h2>
+        <div class="filters" id="runFilters"></div>
+        <ul class="rows" id="runList"></ul>
+      </section>
+      <div style="display:grid;gap:16px;align-content:start">
+        <section class="panel">
+          <h2>Lifts <small id="liftCount"></small></h2>
+          <ul class="rows" id="liftList"></ul>
+        </section>
+        <section class="panel">
+          <h2>Lodges &amp; hours</h2>
+          <div class="hours" id="lodgeList"></div>
+        </section>
+      </div>
+    </div>
+    <section class="panel">
+      <h2>Conditions <small id="condUpdated"></small></h2>
+      <div class="cond" id="condGrid"></div>
+    </section>
+  </div>
+
+  <!-- TRACK VIEW -->
+  <div id="view-track" class="view" hidden style="display:grid;gap:16px">
+    <div class="grid2">
+      <section class="panel">
+        <h2>Speed <small id="trackState">Not tracking</small></h2>
+        <div class="speedo">
+          <div class="big" id="curSpeed">0<em>mph</em></div>
+          <div class="live" id="liveInfo">Top today: 0 mph</div>
+        </div>
+        <div class="btnrow">
+          <button class="btn primary" id="startBtn">Start tracking</button>
+          <button class="btn" id="stopBtn" disabled>Stop</button>
+        </div>
+        <p class="msg" id="trackMsg">Tracking uses your phone's GPS. Keep this page open while you ride.</p>
+      </section>
+      <section class="panel">
+        <h2>Today <small id="todayLabel"></small></h2>
+        <div class="stats" id="todayStats"></div>
+        <form class="inline" id="logForm">
+          <div class="field"><label for="logSpeed">Top speed (mph)</label><input id="logSpeed" type="number" min="0" max="90" step="0.1" placeholder="Optional"></div>
+          <div class="field"><label for="logVert">Vertical (ft)</label><input id="logVert" type="number" min="0" max="6000" step="10" placeholder="Optional"></div>
+          <button class="btn primary" type="submit">+ Log a run</button>
+        </form>
+        <div class="btnrow">
+          <label class="btn small" for="gpxIn" style="cursor:pointer">Import GPX track</label>
+          <input id="gpxIn" type="file" accept=".gpx,application/gpx+xml,text/xml" hidden>
+          <button class="btn small" id="undoRun">Undo last run</button>
+        </div>
+        <p class="msg" id="logMsg"></p>
+      </section>
+    </div>
+    <section class="panel">
+      <h2>Season 2026–27 <small id="seasonSave"></small></h2>
+      <div class="stats" id="seasonStats"></div>
+      <div class="cal" id="cal" aria-label="Days on snow, November through April"></div>
+      <div class="calkey"><span>Nov 1</span><span>Days on snow</span><span>Apr 30</span></div>
+      <div class="btnrow"><button class="btn small" id="checkIn">Check in today</button></div>
+      <div class="tablewrap" style="margin-top:12px">
+        <table>
+          <thead><tr><th>Date</th><th>Mountain</th><th class="num">Runs</th><th class="num">Top mph</th><th class="num">Vert ft</th></tr></thead>
+          <tbody id="dayRows"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- COACH VIEW -->
+  <div id="view-coach" class="view" hidden style="display:grid;gap:16px">
+    <div class="hero">
+      <h1>AI Riding Coach</h1>
+      <div class="sub">Film one run on your phone. The AI breaks down your technique and gives you drills for your next run.</div>
+    </div>
+    <div class="grid2">
+      <section class="panel">
+        <h2>Upload a run <small>5–30 second clip</small></h2>
+        <form id="coachForm">
+          <label class="drop" for="coachFile"><b>Choose a video</b><span>or 3–6 photos from the same run</span><span class="fname" id="coachFileName"></span></label>
+          <input id="coachFile" type="file" accept="video/*,image/*" multiple hidden>
+          <div class="frames" id="coachFrames"></div>
+          <div class="row3">
+            <div class="field"><label for="coachSport">I ride</label><select class="f" id="coachSport"><option value="ski">Skis</option><option value="snowboard">Snowboard</option></select></div>
+            <div class="field"><label for="coachLevel">My level</label><select class="f" id="coachLevel">
+              <option>First season (greens)</option><option selected>Intermediate (blues)</option><option>Advanced (blacks)</option><option>Expert (double blacks, trees)</option></select></div>
+            <div class="field"><label for="coachRun">Run in the clip</label><select class="f" id="coachRun"></select></div>
+          </div>
+          <div class="field" style="margin-top:10px"><label for="coachGoal">What do you want to fix? (optional)</label>
+            <textarea id="coachGoal" maxlength="300" placeholder="e.g. I end up in the back seat on steeper runs"></textarea></div>
+          <div class="btnrow"><button class="btn primary" type="submit" id="coachGo">Analyze my run</button><button class="btn" type="button" id="coachStop" hidden>Stop</button></div>
+          <p class="msg" id="coachMsg">Film from 10–30 feet away with the rider filling most of the frame.</p>
+        </form>
+      </section>
+      <section class="panel">
+        <h2>Your breakdown <small id="coachWhen"></small></h2>
+        <div id="coachResult"></div>
+      </section>
+    </div>
+    <section class="panel">
+      <h2>Past sessions <small>saved on this device</small></h2>
+      <div id="coachHist"></div>
+    </section>
+    <p class="notice">AI feedback is a guide, not a replacement for a certified instructor. Ride within your ability.</p>
+  </div>
+
+  <!-- REVIEWS VIEW -->
+  <div id="view-reviews" class="view" hidden style="display:grid;gap:16px">
+    <div class="hero"><h1 id="rName"></h1></div>
+    <div class="grid2">
+      <section class="panel">
+        <h2>Rating</h2>
+        <div class="ratingsum" id="ratingSum"></div>
+      </section>
+      <section class="panel">
+        <h2 id="formTitle">Rate this mountain</h2>
+        <form id="revForm">
+          <div class="starpick" id="starPick" role="radiogroup" aria-label="Stars"></div>
+          <div class="field" style="margin-top:10px"><label for="revText">How was your day?</label>
+            <textarea id="revText" maxlength="1500" placeholder="Snow, lines, the lodge chili, the run you'd tell a friend about"></textarea></div>
+          <div class="btnrow"><button class="btn primary" type="submit" id="revSubmit">Post review</button>
+          <button class="btn" type="button" id="revDelete" hidden>Delete mine</button></div>
+          <p class="msg" id="revMsg"></p>
+        </form>
+      </section>
+    </div>
+    <section class="panel">
+      <h2>Rider reports <small id="revCount"></small></h2>
+      <div id="revList"></div>
+    </section>
+  </div>
+</main>
+<footer class="credit"><span>Designed and built by <b>Zach Watson</b></span><span id="mtnTotal"></span></footer>
+</div>
+
+<script>
+/* ---------- example mountain data ---------- */
+const T = (o,c)=>({open:o,close:c});
+const MOUNTAINS = [
+ {id:"tussey",name:"Tussey Mountain",state:"PA",summit:1810,vert:500,status:"early",
+  runs:[["Lower Cruiser","g","open","Snowmaking"],["Upper Cruiser","g","open","Snowmaking"],["Easy Street","g","open","Groomed"],["Main Street","b","closed",""],["Centre Run","b","closed",""],["The Chute","k","closed",""],["Stage Coach","b","closed",""],["Terrain Park","p","closed",""]],
+  lifts:[["Summit Quad","quad","open",T("16:00","21:00")],["Learning Carpet","carpet","open",T("16:00","21:00")],["East Double","double","closed",T("","")]],
+  lodges:[["Base Lodge","Rentals, cafeteria",T("15:00","21:30")],["Ticket Window","",T("15:30","20:30")]],
+  cond:{base:14,new24:0,new48:2,temp:31,wind:"NW 8 mph",surface:"Machine groomed",making:true,updated:"6:45 AM"}},
+ {id:"blueknob",name:"Blue Knob",state:"PA",summit:3146,vert:1072,status:"closed",
+  runs:[["Jack Rabbit","g","closed",""],["Mambo Alley","b","closed",""],["Lower Extreme","k","closed",""],["Stembogen","b","closed",""],["Expressway","k","closed",""],["Shortcut","g","closed",""]],
+  lifts:[["Mambo Lift","triple","closed",T("09:00","16:00")],["Expressway Double","double","closed",T("09:00","16:00")],["Lower Lift","double","closed",T("09:00","16:00")]],
+  lodges:[["Summit Lodge","Cafeteria, bar",T("08:30","17:00")]],
+  cond:{base:0,new24:0,new48:0,temp:38,wind:"W 14 mph",surface:"No base yet",making:false,updated:"7:10 AM"}},
+ {id:"sevensprings",name:"Seven Springs",state:"PA",summit:2994,vert:750,status:"early",
+  runs:[["Lost Girl","g","open","Snowmaking"],["Avalanche","b","open","Snowmaking"],["Wagner","b","hold","Grooming"],["North Face","k","closed",""],["Giant Steps","k","closed",""],["Tyrol","g","open","Groomed"],["Goosebump","k","closed",""],["Spot Park","p","closed",""]],
+  lifts:[["Polar Bear Six","six","open",T("09:00","16:30")],["Tyrol Quad","quad","open",T("09:00","16:30")],["North Face Quad","quad","closed",T("09:00","16:30")],["Gondola","gondola","hold",T("09:00","22:00")]],
+  lodges:[["Main Lodge","Food court, rentals",T("08:00","22:00")],["Slopeside Grill","",T("11:00","16:00")]],
+  cond:{base:18,new24:1,new48:3,temp:27,wind:"NW 18 mph",surface:"Packed powder",making:true,updated:"6:30 AM"}},
+ {id:"holidayvalley",name:"Holiday Valley",state:"NY",summit:2250,vert:750,status:"open",
+  runs:[["Yodeler","g","open","Groomed"],["Mardi Gras","b","open","Groomed"],["Champagne","b","open","Groomed"],["Cindy's Run","g","open","Groomed"],["Falcon","k","open","Moguls"],["Eagle","k","hold","Wind hold"],["Edelweiss","b","open","Packed powder"],["Moonshine","p","closed",""]],
+  lifts:[["Mardi Gras Quad","quad","open",T("09:00","22:00")],["Yodeler Quad","quad","open",T("09:00","22:00")],["Eagle Quad","quad","hold",T("09:00","16:30")],["Cindy's Quad","quad","open",T("09:00","16:30")]],
+  lodges:[["Main Chalet","Food, bar, rentals",T("08:00","22:30")],["Tannenbaum Lodge","Rentals, cafeteria",T("08:30","17:00")],["Yodeler Lodge","Lessons",T("08:30","16:30")]],
+  cond:{base:26,new24:4,new48:9,temp:24,wind:"SW 10 mph",surface:"Powder over packed",making:true,updated:"6:15 AM"}},
+ {id:"kissingbridge",name:"Kissing Bridge",state:"NY",summit:1750,vert:550,status:"closed",
+  runs:[["Midway","g","closed",""],["Cardiac","k","closed",""],["Bunny Hill","g","closed",""],["Avalanche","b","closed",""],["Terrain Park","p","closed",""]],
+  lifts:[["Lift 1","double","closed",T("16:00","22:00")],["Lift 4","double","closed",T("16:00","22:00")],["Magic Carpet","carpet","closed",T("16:00","22:00")]],
+  lodges:[["North Lodge","",T("15:30","22:30")],["South Lodge","",T("15:30","22:30")]],
+  cond:{base:0,new24:0,new48:0,temp:39,wind:"S 6 mph",surface:"Opening date pending",making:false,updated:"7:00 AM"}},
+ {id:"killington",name:"Killington",state:"VT",summit:4241,vert:3050,status:"open",
+  runs:[["Rime","b","open","Groomed"],["Reason","b","open","Groomed"],["Great Northern","g","open","Groomed"],["Superstar","k","open","Bumps on skier's left"],["Outer Limits","d","closed",""],["Bear Trap","b","open","Packed powder"],["Upper Downdraft","k","open","Variable"],["Snowshed Park","p","open","Small features"]],
+  lifts:[["K-1 Gondola","gondola","open",T("08:30","16:00")],["North Ridge Quad","quad","open",T("08:30","16:00")],["Superstar Express","quad","open",T("09:00","15:30")],["Skye Peak Express","quad","hold",T("09:00","15:30")],["Snowshed Express","quad","open",T("08:00","16:00")]],
+  lodges:[["K-1 Base Lodge","Food, bar, rentals",T("07:30","17:00")],["Peak Lodge","Summit dining",T("09:00","15:30")],["Snowshed Lodge","Lessons, rentals",T("07:30","17:00")]],
+  cond:{base:22,new24:3,new48:7,temp:19,wind:"NW 22 mph",surface:"Packed powder",making:true,updated:"5:50 AM"}},
+];
+/* More mountains: [id, name, state, summit ft, vertical ft, status, night skiing] */
+const MORE=[
+ ["hiddenvalleypa","Hidden Valley","PA",2875,470,"closed",1],["laurel","Laurel Mountain","PA",2700,761,"closed",0],
+ ["whitetail","Whitetail","PA",1800,935,"closed",1],["liberty","Liberty Mountain","PA",1190,620,"closed",1],
+ ["roundtop","Roundtop","PA",1355,600,"closed",1],["camelback","Camelback","PA",2133,800,"early",1],
+ ["bluemtnpa","Blue Mountain","PA",1600,1082,"closed",1],["elk","Elk Mountain","PA",2693,1000,"closed",1],
+ ["montage","Montage Mountain","PA",2000,1000,"closed",1],["bearcreek","Bear Creek","PA",1100,510,"closed",1],
+ ["holimont","HoliMont","NY",2260,700,"closed",0],["peeknpeak","Peek'n Peak","NY",1800,400,"closed",1],
+ ["bristol","Bristol Mountain","NY",2200,1200,"closed",1],["greekpeak","Greek Peak","NY",2100,952,"closed",1],
+ ["whiteface","Whiteface","NY",4650,3430,"closed",0],["gore","Gore Mountain","NY",3600,2537,"closed",0],
+ ["hunter","Hunter Mountain","NY",3200,1600,"closed",0],["windham","Windham Mountain","NY",3100,1600,"closed",1],
+ ["belleayre","Belleayre","NY",3429,1404,"closed",0],
+ ["stowe","Stowe","VT",3625,2360,"closed",0],["sugarbush","Sugarbush","VT",4083,2600,"closed",0],
+ ["jay","Jay Peak","VT",3968,2153,"closed",0],["stratton","Stratton","VT",3875,2003,"closed",0],
+ ["okemo","Okemo","VT",3344,2200,"closed",0],["mountsnow","Mount Snow","VT",3600,1700,"early",0],
+ ["loon","Loon Mountain","NH",3050,2100,"early",0],["cannon","Cannon Mountain","NH",4080,2180,"closed",0],
+ ["bretton","Bretton Woods","NH",3100,1500,"closed",0],["waterville","Waterville Valley","NH",4004,2020,"closed",0],
+ ["sundayriver","Sunday River","ME",3140,2340,"early",0],["sugarloaf","Sugarloaf","ME",4237,2820,"early",0],
+ ["snowshoe","Snowshoe","WV",4848,1500,"closed",1],["wisp","Wisp","MD",3115,700,"closed",1],
+ ["boyne","Boyne Mountain","MI",1120,500,"closed",1],["granitepeak","Granite Peak","WI",1942,700,"closed",1],
+ ["vail","Vail","CO",11570,3450,"early",0],["breck","Breckenridge","CO",12998,3398,"early",0],
+ ["keystone","Keystone","CO",12408,3128,"early",1],["abasin","Arapahoe Basin","CO",13050,2530,"open",0],
+ ["parkcity","Park City","UT",10026,3200,"closed",0],["snowbird","Snowbird","UT",11000,3240,"closed",0],
+ ["jackson","Jackson Hole","WY",10450,4139,"closed",0],["bigsky","Big Sky","MT",11166,4350,"closed",0],
+ ["mammoth","Mammoth Mountain","CA",11053,3100,"early",0],["palisades","Palisades Tahoe","CA",9050,2850,"closed",0],
+ ["bachelor","Mt. Bachelor","OR",9065,3365,"closed",0],["crystal","Crystal Mountain","WA",7012,3100,"closed",0],
+ ["bluemtnon","Blue Mountain","ON",1772,720,"closed",1],["tremblant","Tremblant","QC",2871,2116,"closed",0],
+ ["whistler","Whistler Blackcomb","BC",7494,5280,"closed",0],["banff","Banff Sunshine","AB",8954,3514,"early",0],
+];
+const RUN_POOL={g:["Easy Street","Lazy Mile","Meadow Way","Bunny Slope","Sunset Trail","Cruiser","Homeward","Lower Glade"],
+ b:["Ridge Run","Panorama","Upper Cruiser","Showboat","Timber Line","Boulevard","Summit Road","Fox Run","Snowbird Bowl","Cascade"],
+ k:["Headwall","Upper Chute","The Plunge","Gunbarrel","Ridgeline Glades","Big Bump","Hellgate"],
+ d:["The Couloir","North Face Chutes","Cliffside"],p:["Terrain Park","Rail Garden"]};
+function seeded(str){let h=2166136261;for(const c of str)h=Math.imul(h^c.charCodeAt(0),16777619);return()=>((h=Math.imul(h^(h>>>15),2246822507)>>>0)%10000)/10000}
+function genMountain([id,name,state,summit,vert,status,night]){
+  const rnd=seeded(id),pickFrom=a=>a.splice(Math.floor(rnd()*a.length),1)[0];
+  const big=vert>2000,pool=JSON.parse(JSON.stringify(RUN_POOL));
+  const mix=big?["g","g","b","b","b","k","k","d","p"]:["g","g","b","b","b","k","p"];
+  const openShare=status==="open"?.75:status==="early"?.3:0;
+  const runs=mix.map((d,i)=>{const s=rnd()<openShare&&d!=="d"||(status!=="closed"&&i<1)?"open":"closed";return [pickFrom(pool[d]),d,s,s==="open"?(d==="k"?"Moguls":d==="p"?"Small features":rnd()<.5?"Snowmaking":"Groomed"):""]});
+  const close=night?"21:00":"16:00",open=state==="CO"||state==="UT"||state==="WY"||state==="MT"?"09:00":"08:30";
+  const liftNames=big?["Summit Express","Gondola","North Peak Quad","Base Six","Ridge Triple"]:["Summit Quad","Base Triple","Learning Carpet","East Double"];
+  const lifts=liftNames.map((n,i)=>{const type=/Gondola/.test(n)?"gondola":/Six/.test(n)?"six":/Quad|Express/.test(n)?"quad":/Triple/.test(n)?"triple":/Carpet/.test(n)?"carpet":"double";
+    const s=status==="closed"?"closed":status==="open"?(i<lifts_open(liftNames.length)?"open":"hold"):(i===0||/Carpet/.test(n)?"open":"closed");return [n,type,s,T(open,i===0?close:"16:00")]});
+  function lifts_open(n){return Math.ceil(n*.7)}
+  const lodges=[["Base Lodge","Food, rentals, tickets",T(open==="09:00"?"08:00":"07:30",night?"22:00":"17:00")],["Summit Lodge",big?"Summit dining":"Snacks, warming hut",T("09:30","15:30")]];
+  const cold=state==="CO"||state==="UT"||state==="WY"||state==="MT"||state==="AB"||state==="BC"?-6:0;
+  const base=status==="closed"?0:Math.round((status==="open"?20:10)+rnd()*14);
+  const n24=status==="closed"?0:Math.round(rnd()*5);
+  return {id,name,state,summit,vert,status,runs,lifts,lodges,
+    cond:{base,new24:n24,new48:n24+Math.round(rnd()*4),temp:Math.round((status==="closed"?36:26)+cold+rnd()*8),wind:["NW","W","SW","N"][Math.floor(rnd()*4)]+" "+Math.round(5+rnd()*20)+" mph",
+      surface:status==="closed"?"Opening date pending":base>20?"Packed powder":"Machine groomed",making:status!=="closed"||rnd()<.3,updated:"6:"+String(Math.floor(rnd()*50)+10)+" AM"}};
+}
+MORE.forEach(m=>MOUNTAINS.push(genMountain(m)));
+const REGION_OF={PA:"Pennsylvania",NY:"New York",VT:"Vermont",NH:"New Hampshire & Maine",ME:"New Hampshire & Maine",WV:"Mid-Atlantic",MD:"Mid-Atlantic",MI:"Midwest",WI:"Midwest",CO:"Rockies",UT:"Rockies",WY:"Rockies",MT:"Rockies",CA:"West Coast",OR:"West Coast",WA:"West Coast",ON:"Canada",QC:"Canada",BC:"Canada",AB:"Canada"};
+const REGIONS=["Pennsylvania","New York","Vermont","New Hampshire & Maine","Mid-Atlantic","Midwest","Rockies","West Coast","Canada"];
+const STATUS_LBL={open:["Open","ok"],early:["Early season","warn"],closed:["Not open yet","bad"]};
+const DIFF={g:"Beginner",b:"Intermediate",k:"Advanced",d:"Expert",p:"Terrain park"};
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const ls={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const todayKey=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const fmtTime=t=>{if(!t)return "—";let[h,m]=t.split(":").map(Number);const ap=h>=12?"PM":"AM";h=h%12||12;return h+(m?":"+String(m).padStart(2,"0"):"")+" "+ap};
+const nowMins=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()};
+const toMins=t=>{const[h,m]=t.split(":").map(Number);return h*60+m};
+const openNow=h=>h.open&&nowMins()>=toMins(h.open)&&nowMins()<toMins(h.close);
+function diffIcon(d){
+  const c={g:"var(--green)",b:"var(--blue)",k:"var(--black)",d:"var(--black)",p:"var(--accent)"}[d];
+  if(d==="g")return `<svg class="sym" viewBox="0 0 16 16" aria-label="Beginner"><circle cx="8" cy="8" r="7" fill="${c}"/></svg>`;
+  if(d==="b")return `<svg class="sym" viewBox="0 0 16 16" aria-label="Intermediate"><rect x="1.5" y="1.5" width="13" height="13" fill="${c}"/></svg>`;
+  if(d==="k")return `<svg class="sym" viewBox="0 0 16 16" aria-label="Advanced"><path d="M8 0.5 15.5 8 8 15.5 0.5 8Z" fill="${c}"/></svg>`;
+  if(d==="d")return `<svg class="sym" viewBox="0 0 16 16" aria-label="Expert"><path d="M4.5 2 8.5 8 4.5 14 0.5 8Z M11.5 2 15.5 8 11.5 14 7.5 8Z" fill="${c}"/></svg>`;
+  return `<svg class="sym" viewBox="0 0 16 16" aria-label="Terrain park"><rect x="1.5" y="3" width="13" height="10" rx="2" fill="${c}"/></svg>`;
+}
+const starSvg=f=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z" fill="${f?"currentColor":"none"}" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+const starsHtml=n=>`<span class="stars" aria-label="${n} of 5 stars">${[1,2,3,4,5].map(i=>starSvg(i<=Math.round(n))).join("")}</span>`;
+
+/* ---------- state ---------- */
+let mtnId=ls.get("cl.mtn","holidayvalley");
+if(!MOUNTAINS.find(m=>m.id===mtnId))mtnId="holidayvalley";
+let runFilter="all";
+let season=ls.get("cl.season",{days:{}}); // days[date]={mtn,runs:[{top,vert,t}]}
+let reviews={}; // userId -> {items:{mtnId:{stars,text,ts}}}
+let db=null,user=null,myId=null,profiles={};
+const M=()=>MOUNTAINS.find(m=>m.id===mtnId);
+
+/* ---------- mountain view ---------- */
+function renderPicker(){
+  $("#mtnSel").innerHTML=REGIONS.map(r=>{const ms=MOUNTAINS.filter(m=>REGION_OF[m.state]===r).sort((a,b)=>a.name.localeCompare(b.name));
+    return ms.length?`<optgroup label="${esc(r)}">${ms.map(m=>`<option value="${m.id}"${m.id===mtnId?" selected":""}>${esc(m.name)}, ${m.state}</option>`).join("")}</optgroup>`:""}).join("");
+  $("#mtnTotal").textContent=MOUNTAINS.length+" mountains · example conditions";
+}
+function renderMountain(){
+  const m=M();const [sl,sc]=STATUS_LBL[m.status];
+  $("#mName").textContent=m.name;
+  const avg=avgFor(m.id);
+  $("#mSub").innerHTML=`<span class="pill ${sc}"><span class="dot"></span>${sl}</span><span>${m.state} · Summit ${m.summit.toLocaleString()} ft · ${m.vert.toLocaleString()} ft vertical</span>`+(avg.n?`<span>${starsHtml(avg.avg)} ${avg.avg.toFixed(1)} (${avg.n})</span>`:"");
+  const ro=m.runs.filter(r=>r[2]==="open").length, lo=m.lifts.filter(l=>l[2]==="open").length;
+  $("#mStats").innerHTML=[
+    [ro+"<em>/"+m.runs.length+"</em>","Runs open"],[lo+"<em>/"+m.lifts.length+"</em>","Lifts spinning"],
+    [m.cond.base+"<em>in</em>","Base depth"],[m.cond.new24+"<em>in</em>","New, 24 hr"],[m.cond.temp+"<em>°F</em>","Summit temp"]
+  ].map(([v,l])=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`).join("");
+  $("#runCount").textContent=ro+" of "+m.runs.length+" open";
+  const kinds=["all",...new Set(m.runs.map(r=>r[1]))];
+  if(!kinds.includes(runFilter))runFilter="all";
+  $("#runFilters").innerHTML=[["open","Open only"],...kinds.map(k=>[k,k==="all"?"All":DIFF[k]])].map(([k,l])=>`<button class="chip" data-f="${k}" aria-pressed="${runFilter===k}">${l}</button>`).join("");
+  const rs=m.runs.filter(r=>runFilter==="all"||(runFilter==="open"?r[2]==="open":r[1]===runFilter));
+  $("#runList").innerHTML=rs.length?rs.map(([n,d,s,note])=>`<li class="${s==="open"?"":"closed"}">${diffIcon(d)}<div class="nm">${esc(n)}<small>${DIFF[d]}${note?" · "+esc(note):""}</small></div><span class="status ${s}">${s==="hold"?"On hold":s}</span></li>`).join(""):`<li><span></span><div class="nm empty">No runs match this filter.</div><span></span></li>`;
+  $("#liftCount").textContent=lo+" of "+m.lifts.length+" open";
+  $("#liftList").innerHTML=m.lifts.map(([n,type,s,h])=>`<li class="${s==="open"?"":"closed"}"><svg class="sym" viewBox="0 0 16 16" aria-hidden="true"><path d="M1 3 15 1" stroke="var(--muted)" stroke-width="1.4"/><path d="M8 2v6" stroke="var(--muted)" stroke-width="1.4"/><rect x="4" y="8" width="8" height="6" rx="1.5" fill="${s==="open"?"var(--ok)":"var(--muted)"}"/></svg><div class="nm">${esc(n)}<small>${type[0].toUpperCase()+type.slice(1)} · ${h.open?fmtTime(h.open)+" – "+fmtTime(h.close):"Hours TBA"}</small></div><span class="status ${s}">${s==="hold"?"On hold":s}</span></li>`).join("");
+  $("#lodgeList").innerHTML=m.lodges.map(([n,sub,h])=>{const on=m.status!=="closed"&&openNow(h);return `<div class="k">${esc(n)}<small>${sub?esc(sub)+" · ":""}${m.status==="closed"?"Closed for season":on?"Open now":"Closed now"}</small></div><div class="t">${fmtTime(h.open)} – ${fmtTime(h.close)}</div>`}).join("");
+  const c=m.cond;
+  $("#condUpdated").textContent="Updated "+c.updated;
+  $("#condGrid").innerHTML=`
+    <div><span>Base depth</span><b>${c.base}"</b><div class="snowbar"><i style="width:${Math.min(100,c.base/60*100)}%"></i></div></div>
+    <div><span>New snow 24 / 48 hr</span><b>${c.new24}" / ${c.new48}"</b></div>
+    <div><span>Surface</span><b style="font-size:20px">${esc(c.surface)}</b></div>
+    <div><span>Summit temp</span><b>${c.temp}°F</b></div>
+    <div><span>Wind</span><b>${esc(c.wind)}</b></div>
+    <div><span>Snowmaking</span><b>${c.making?"Running":"Off"}</b></div>`;
+}
+
+/* ---------- tabs ---------- */
+function setView(v){
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.view===v));
+  document.querySelectorAll(".view").forEach(el=>el.hidden=el.id!=="view-"+v);
+  try{if(location.hash!=="#"+v)history.replaceState(null,"","#"+v)}catch(e){}
+}
+document.querySelectorAll("nav.tabs button").forEach(b=>b.onclick=()=>setView(b.dataset.view));
+window.addEventListener("hashchange",()=>{const v=location.hash.slice(1);if(["mountain","track","coach","reviews"].includes(v))setView(v)});
+$("#mtnSel").onchange=e=>{mtnId=e.target.value;ls.set("cl.mtn",mtnId);renderAll()};
+$("#runFilters").onclick=e=>{const b=e.target.closest(".chip");if(!b)return;runFilter=b.dataset.f;renderMountain()};
+
+/* ---------- season & day tracking ---------- */
+let saveTimer=null;
+function persistSeason(){
+  ls.set("cl.season",season);
+  if(!db||!myId){$("#seasonSave").textContent="Saved on this device";return}
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(async()=>{
+    try{await db.doc("data/users/"+myId+"/season").set({days:season.days,updated:Date.now()});$("#seasonSave").textContent="Saved to your account"}
+    catch(e){$("#seasonSave").textContent="Saved on this device"}
+  },600);
+}
+function today(){const k=todayKey();if(!season.days[k])season.days[k]={mtn:mtnId,runs:[]};return season.days[k]}
+function addRun(top,vert){const d=today();d.mtn=mtnId;d.runs.push({top:top||0,vert:vert||0,t:Date.now()});persistSeason();renderTrack()}
+function seasonRange(){const now=new Date();const y=now.getMonth()>=6?now.getFullYear():now.getFullYear()-1;return [new Date(y,10,1),new Date(y+1,3,30)]}
+function renderTrack(){
+  const k=todayKey(),d=season.days[k]||{runs:[]};
+  const top=Math.max(0,...d.runs.map(r=>r.top)),vert=d.runs.reduce((a,r)=>a+r.vert,0);
+  $("#todayLabel").textContent=new Date().toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})+(d.mtn?" · "+(MOUNTAINS.find(m=>m.id===d.mtn)||M()).name:"");
+  $("#todayStats").innerHTML=[[d.runs.length,"Runs"],[top?top.toFixed(1):"0","Top mph"],[vert.toLocaleString(),"Vertical ft"]].map(([v,l])=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`).join("");
+  if(!live.on)$("#liveInfo").textContent="Top today: "+(top?top.toFixed(1):0)+" mph";
+  const [s,e]=seasonRange();
+  const keys=Object.keys(season.days).filter(x=>{const t=new Date(x+"T12:00");return t>=s&&t<=e}).sort().reverse();
+  const days=keys.filter(x=>season.days[x].runs.length||season.days[x].checked);
+  const allRuns=days.reduce((a,x)=>a+season.days[x].runs.length,0);
+  const allVert=days.reduce((a,x)=>a+season.days[x].runs.reduce((b,r)=>b+r.vert,0),0);
+  const best=Math.max(0,...days.flatMap(x=>season.days[x].runs.map(r=>r.top)));
+  const mtns=new Set(days.map(x=>season.days[x].mtn)).size;
+  $("#seasonStats").innerHTML=[[days.length,"Days on snow"],[allRuns,"Runs"],[allVert.toLocaleString(),"Vertical ft"],[best?best.toFixed(1):"0","Season top mph"],[mtns,"Mountains"]].map(([v,l])=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`).join("");
+  let cal="";const on=new Set(days);
+  for(let t=new Date(s);t<=e;t.setDate(t.getDate()+1)){const key=t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0");cal+=`<i class="${on.has(key)?"on":""}${key===k?" today":""}" title="${key}"></i>`}
+  $("#cal").innerHTML=cal;
+  $("#dayRows").innerHTML=days.length?days.map(x=>{const dd=season.days[x];const mm=MOUNTAINS.find(m=>m.id===dd.mtn);return `<tr><td>${new Date(x+"T12:00").toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}</td><td>${esc(mm?mm.name:dd.mtn)}</td><td class="num">${dd.runs.length}</td><td class="num">${Math.max(0,...dd.runs.map(r=>r.top)).toFixed(1)}</td><td class="num">${dd.runs.reduce((a,r)=>a+r.vert,0).toLocaleString()}</td></tr>`}).join(""):`<tr><td colspan="5" class="empty">No days yet. Log a run or check in on your first day out and it lands here.</td></tr>`;
+  $("#checkIn").textContent=on.has(k)?"Checked in today ✓":"Check in today";
+  $("#checkIn").disabled=on.has(k);
+}
+$("#logForm").onsubmit=e=>{e.preventDefault();const s=parseFloat($("#logSpeed").value)||0,v=parseFloat($("#logVert").value)||0;
+  if(s>90){$("#logMsg").textContent="That speed looks like a GPS glitch. Enter 90 mph or less.";return}
+  addRun(s,v);$("#logSpeed").value="";$("#logVert").value="";$("#logMsg").textContent="Run logged at "+M().name+"."};
+$("#undoRun").onclick=()=>{const d=season.days[todayKey()];if(d&&d.runs.length){d.runs.pop();persistSeason();renderTrack();$("#logMsg").textContent="Last run removed."}else $("#logMsg").textContent="No runs today to undo."};
+$("#checkIn").onclick=()=>{const d=today();d.checked=true;d.mtn=mtnId;persistSeason();renderTrack()};
+
+/* GPX import: split a recorded track into runs */
+const R=6371000;
+function hav(a,b){const r=x=>x*Math.PI/180;const dl=r(b.lat-a.lat),dn=r(b.lon-a.lon);const h=Math.sin(dl/2)**2+Math.cos(r(a.lat))*Math.cos(r(b.lat))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+function analyze(pts){
+  // pts: {lat,lon,ele(m),t(ms)}
+  const seg=[];
+  for(let i=1;i<pts.length;i++){const dt=(pts[i].t-pts[i-1].t)/1000;if(dt<=0||dt>120)continue;
+    seg.push({t:pts[i].t,v:hav(pts[i-1],pts[i])/dt*2.23694,de:(pts[i].ele-pts[i-1].ele)});}
+  // smooth speed over 3 samples, smooth elevation trend over 6
+  const runs=[];let cur=null,quiet=0;
+  for(let i=0;i<seg.length;i++){
+    const w=seg.slice(Math.max(0,i-1),i+2);const v=w.reduce((a,s)=>a+s.v,0)/w.length;
+    const ew=seg.slice(Math.max(0,i-3),i+3);const trend=ew.reduce((a,s)=>a+s.de,0);
+    const down=v>5&&trend<-1;
+    if(down){if(!cur)cur={top:0,drop:0};cur.top=Math.max(cur.top,Math.min(v,90));if(seg[i].de<0)cur.drop+=-seg[i].de;quiet=0}
+    else if(cur){quiet++;if(quiet>8||trend>4){if(cur.drop>30)runs.push(cur);cur=null;quiet=0}}
+  }
+  if(cur&&cur.drop>30)runs.push(cur);
+  return runs.map(r=>({top:r.top,vert:Math.round(r.drop*3.28084)}));
+}
+$("#gpxIn").onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{
+    const xml=new DOMParser().parseFromString(await f.text(),"application/xml");
+    const pts=[...xml.getElementsByTagName("trkpt")].map(p=>({lat:+p.getAttribute("lat"),lon:+p.getAttribute("lon"),ele:+(p.getElementsByTagName("ele")[0]?.textContent||0),t:Date.parse(p.getElementsByTagName("time")[0]?.textContent||"")})).filter(p=>!isNaN(p.t));
+    if(pts.length<10)throw new Error("This file has no timed track points. Export the GPX with timestamps and try again.");
+    const runs=analyze(pts);
+    if(!runs.length)throw new Error("No downhill runs found in this track.");
+    const dt=new Date(pts[0].t);const key=dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0");
+    season.days[key]={mtn:mtnId,runs:runs.map(r=>({...r,t:pts[0].t})),checked:true};
+    persistSeason();renderTrack();
+    $("#logMsg").textContent=`Imported ${runs.length} runs from ${f.name} for ${dt.toLocaleDateString()} at ${M().name}.`;
+  }catch(err){$("#logMsg").textContent=err.message||"Could not read that file. Pick a .gpx file exported from your tracker."}
+  e.target.value="";
+};
+
+/* Live GPS tracking */
+const live={on:false,watch:null,last:null,top:0,run:null,quiet:0,alt:[],lock:null};
+function setTrackUI(){ $("#startBtn").disabled=live.on;$("#stopBtn").disabled=!live.on;$("#trackState").textContent=live.on?(live.run?"On a run":"Riding the lift / resting"):"Not tracking"}
+$("#startBtn").onclick=()=>{
+  if(!("geolocation" in navigator)){$("#trackMsg").textContent="This browser has no GPS access. Log runs by hand or import a GPX file from your tracker.";$("#trackMsg").className="msg err";return}
+  live.on=true;live.last=null;live.run=null;live.top=0;setTrackUI();
+  $("#trackMsg").className="msg";$("#trackMsg").textContent="Waiting for a GPS fix…";
+  try{navigator.wakeLock?.request("screen").then(l=>live.lock=l).catch(()=>{})}catch(e){}
+  live.watch=navigator.geolocation.watchPosition(onPos,err=>{
+    stopLive();$("#trackMsg").className="msg err";
+    $("#trackMsg").textContent="Location isn't available here ("+(err.message||"permission refused")+"). Log runs by hand or import a GPX file from your phone's tracker.";
+  },{enableHighAccuracy:true,maximumAge:0,timeout:20000});
+};
+function onPos(p){
+  const c=p.coords,pt={lat:c.latitude,lon:c.longitude,ele:c.altitude??null,t:p.timestamp};
+  let mph=c.speed!=null&&c.speed>=0?c.speed*2.23694:0;
+  if(live.last&&(c.speed==null)){const dt=(pt.t-live.last.t)/1000;if(dt>0)mph=hav(live.last,pt)/dt*2.23694}
+  mph=Math.min(mph,90);
+  const de=live.last&&pt.ele!=null&&live.last.ele!=null?pt.ele-live.last.ele:0;
+  live.alt.push(de);if(live.alt.length>6)live.alt.shift();
+  const trend=live.alt.reduce((a,b)=>a+b,0);
+  const down=mph>5&&(pt.ele==null||trend<-1);
+  if(down){if(!live.run)live.run={top:0,drop:0};live.run.top=Math.max(live.run.top,mph);if(de<0)live.run.drop+=-de;live.quiet=0}
+  else if(live.run){live.quiet++;if(live.quiet>10||trend>4){const r=live.run;live.run=null;live.quiet=0;if(r.drop>30||pt.ele==null)addRun(r.top,Math.round(r.drop*3.28084))}}
+  live.top=Math.max(live.top,mph);live.last=pt;
+  $("#curSpeed").innerHTML=mph.toFixed(0)+"<em>mph</em>";
+  const d=season.days[todayKey()];const topToday=Math.max(live.top,0,...(d?d.runs.map(r=>r.top):[]));
+  $("#liveInfo").textContent="Top today: "+topToday.toFixed(1)+" mph · GPS ±"+Math.round(c.accuracy)+" m";
+  $("#trackMsg").textContent="Tracking. Runs are counted automatically when you head downhill.";
+  setTrackUI();
+}
+function stopLive(){
+  if(live.watch!=null)navigator.geolocation.clearWatch(live.watch);
+  if(live.run&&live.run.top>5)addRun(live.run.top,Math.round(live.run.drop*3.28084));
+  live.on=false;live.watch=null;live.run=null;try{live.lock?.release()}catch(e){}
+  $("#curSpeed").innerHTML="0<em>mph</em>";setTrackUI();renderTrack();
+}
+$("#stopBtn").onclick=()=>{stopLive();$("#trackMsg").className="msg";$("#trackMsg").textContent="Tracking stopped. Your runs are saved."};
+
+/* ---------- reviews ---------- */
+function allReviewsFor(id){
+  return Object.entries(reviews).map(([uid,doc])=>{const r=doc?.items?.[id];return r&&r.stars?{uid,...r}:null}).filter(Boolean).sort((a,b)=>b.ts-a.ts);
+}
+function avgFor(id){const rs=allReviewsFor(id);return {n:rs.length,avg:rs.length?rs.reduce((a,r)=>a+r.stars,0)/rs.length:0}}
+let pick=0;
+function renderStarsPick(){
+  $("#starPick").innerHTML=[1,2,3,4,5].map(i=>`<button type="button" role="radio" aria-checked="${pick===i}" aria-label="${i} star${i>1?"s":""}" data-s="${i}" class="${i<=pick?"on":""}">${starSvg(i<=pick)}</button>`).join("");
+}
+$("#starPick").onclick=e=>{const b=e.target.closest("button");if(!b)return;pick=+b.dataset.s;renderStarsPick()};
+async function renderReviews(){
+  const m=M();$("#rName").textContent=m.name;
+  const rs=allReviewsFor(m.id),a=avgFor(m.id);
+  const dist=[5,4,3,2,1].map(s=>rs.filter(r=>r.stars===s).length);
+  $("#ratingSum").innerHTML=`<div><div class="avg">${a.n?a.avg.toFixed(1):"–"}</div>${starsHtml(a.avg)}<div class="notice">${a.n} rating${a.n===1?"":"s"}</div></div>
+   <div class="bars">${[5,4,3,2,1].map((s,i)=>`<div><span>${s}★</span><span class="b"><i style="width:${a.n?dist[i]/a.n*100:0}%"></i></span><span>${dist[i]}</span></div>`).join("")}</div>`;
+  $("#revCount").textContent=rs.length?rs.length+" posted":"";
+  const mine=myId&&reviews[myId]?.items?.[m.id];
+  $("#formTitle").textContent=mine?"Your review":"Rate "+m.name;
+  $("#revDelete").hidden=!mine;
+  $("#revSubmit").textContent=mine?"Update review":"Post review";
+  if(!db){$("#revSubmit").disabled=true;$("#revMsg").textContent="Reviews are coming soon. Posting needs a shared database, which this site doesn't have yet.";}
+  if(!rs.length){$("#revList").innerHTML=`<div class="empty">No reviews of ${esc(m.name)} yet. Pick your stars and tell people how the day went.</div>`;return}
+  const ids=rs.map(r=>r.uid);
+  if(user){try{Object.assign(profiles,await user.profiles(ids))}catch(e){}}
+  $("#revList").innerHTML=rs.map(r=>`<div class="review"><div class="who"><b></b>${starsHtml(r.stars)}</div>${r.text?`<p></p>`:""}<div class="meta">${new Date(r.ts).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"})}${r.days?` · ${r.days} day${r.days>1?"s":""} on snow this season`:""}</div></div>`).join("");
+  [...$("#revList").children].forEach((el,i)=>{const r=rs[i];el.querySelector("b").textContent=(profiles[r.uid]?.name||"A rider")+(r.uid===myId?" (you)":"");const p=el.querySelector("p");if(p)p.textContent=r.text});
+}
+function loadMineIntoForm(){
+  const mine=myId&&reviews[myId]?.items?.[mtnId];
+  pick=mine?mine.stars:0;$("#revText").value=mine?mine.text:"";renderStarsPick();
+}
+$("#revForm").onsubmit=async e=>{
+  e.preventDefault();
+  if(!db||!myId){$("#revMsg").textContent="Reviews are coming soon.";return}
+  if(!pick){$("#revMsg").textContent="Pick 1 to 5 stars first.";return}
+  const daysCount=Object.values(season.days).filter(d=>d.runs.length||d.checked).length;
+  const items={...(reviews[myId]?.items||{})};
+  items[mtnId]={stars:pick,text:$("#revText").value.trim().slice(0,1500),ts:Date.now(),days:daysCount};
+  $("#revSubmit").disabled=true;
+  try{await db.doc("reviews/"+myId).set({items});$("#revMsg").textContent="Posted."}
+  catch(err){$("#revMsg").textContent=err?.code==="not_granted"?"You have view-only access to this page, so you can read reviews but not post.":"Couldn't post right now. Try again in a moment."}
+  $("#revSubmit").disabled=false;
+};
+$("#revDelete").onclick=async()=>{
+  if(!db||!myId)return;const items={...(reviews[myId]?.items||{})};delete items[mtnId];
+  try{await db.doc("reviews/"+myId).set({items});$("#revMsg").textContent="Your review was removed.";pick=0;$("#revText").value="";renderStarsPick()}
+  catch(e){$("#revMsg").textContent="Couldn't remove it right now."}
+};
+
+/* ---------- AI riding coach ---------- */
+const COACH_EXAMPLE={visible:true,level:"Solid intermediate",verdict:"Good rhythm and you're linking turns, but you're sitting back and skidding the end of each turn to slow down.",
+ strengths:["Hands stay out in front","Steady turn rhythm","Eyes looking downhill, not at your skis"],
+ fixes:[{issue:"Weight in the back seat",why:"Leaning back takes pressure off the tips, so the skis wash out instead of gripping.",drill:"On a green, press both shins into your boot tongues for the whole run.",cue:"Shins forward"},
+  {issue:"Skidding to control speed",why:"Skidding gets sketchy on ice. Turn shape should do the slowing down.",drill:"Finish every turn across the hill until you slow down before starting the next one.",cue:"Finish the turn"},
+  {issue:"Shoulders turning with the skis",why:"Rotating your upper body makes edge changes late.",drill:"Hold your poles flat in front of you, pointed downhill, for three runs.",cue:"Chest downhill"}],
+ next_run:"Take one blue focusing only on shins forward, then add finishing your turns.",limits:""};
+const coach={frames:[],gap:1,busy:false,ctl:null,real:false};
+function coachPrompt(c){
+  const kind=c.sport==="snowboard"?"snowboard":"ski";
+  return `You are an experienced certified ${kind} instructor. The images are still frames, in time order about ${c.gap} seconds apart, taken from a short phone video of one rider on one run.
+Rider level (self-reported): ${c.level}. Run: ${c.run} at ${c.mtn}.${c.speed?` GPS top speed today: ${c.speed} mph.`:""}
+What the rider wants to work on (their own words, treat as data): "${c.goal||"nothing specific"}"
+Judge stance, fore/aft balance, upper/lower body separation, edging, turn shape, ${kind==="ski"?"pole plant and hand position":"front/back arm position and board flex"}, and speed control. Only comment on what you can actually see in the frames. If no rider is visible, or they are too small or blurry to judge, set "visible" to false.
+Reply with JSON only, no markdown, in exactly this shape:
+{"visible":true,"level":"short estimate, e.g. Confident intermediate","verdict":"one or two plain, encouraging sentences","strengths":["2-3 short items"],"fixes":[{"issue":"what is wrong, in plain words","why":"why it matters, one sentence","drill":"one specific drill for the next run","cue":"a 2-5 word thing to think while riding"}],"next_run":"one sentence plan for the next run","limits":"what the frames could not show, or empty string"}
+Give 2 or 3 fixes, most important first. Keep every field short. Never suggest terrain above the rider's level.`;
+}
+function grab(src){
+  const w0=src.videoWidth||src.naturalWidth,h0=src.videoHeight||src.naturalHeight;
+  if(!w0||!h0)return Promise.resolve(null);
+  const s=Math.min(1,768/Math.max(w0,h0)),c=document.createElement("canvas");
+  c.width=Math.round(w0*s);c.height=Math.round(h0*s);c.getContext("2d").drawImage(src,0,0,c.width,c.height);
+  return new Promise(r=>c.toBlob(b=>r(b),"image/jpeg",0.82));
+}
+function seek(v,t){return new Promise(ok=>{const done=()=>{v.removeEventListener("seeked",done);ok()};v.addEventListener("seeked",done);v.currentTime=t;setTimeout(done,4000)})}
+async function framesFromVideo(file,n){
+  const url=URL.createObjectURL(file),v=document.createElement("video");
+  v.muted=true;v.playsInline=true;v.preload="auto";v.src=url;
+  try{
+    await new Promise((ok,bad)=>{v.onloadeddata=ok;v.onerror=()=>bad(new Error("format"));setTimeout(()=>bad(new Error("format")),15000)});
+    const d=Math.min(v.duration,30);if(!isFinite(d)||d<=0)throw new Error("format");
+    const out=[];for(let i=0;i<n;i++){await seek(v,Math.min(v.duration-0.05,d*(i+0.5)/n));out.push(await grab(v))}
+    return {frames:out.filter(Boolean),gap:d/n};
+  }finally{URL.revokeObjectURL(url)}
+}
+async function framesFromImages(files){
+  const out=[];
+  for(const f of files){const url=URL.createObjectURL(f);try{const img=new Image();img.src=url;await img.decode();out.push(await grab(img))}catch(e){}finally{URL.revokeObjectURL(url)}}
+  return {frames:out.filter(Boolean),gap:1};
+}
+const b64=b=>new Promise((ok,bad)=>{const r=new FileReader();r.onload=()=>ok(String(r.result).split(",")[1]);r.onerror=bad;r.readAsDataURL(b)});
+async function runCoach(ctx,blobs,signal){
+  if(window.claude?.use){
+    const sample=await claude.use("sample");
+    if(sample){
+      const caps=await sample.limits().catch(()=>null);
+      const max=caps?.images?.maxCount||blobs.length;
+      return await sample.json(coachPrompt(ctx),{images:blobs.slice(0,Math.min(6,max)),modelTier:"default",signal});
+    }
+  }
+  const images=await Promise.all(blobs.slice(0,6).map(b64));
+  const r=await fetch("/api/coach",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({...ctx,images}),signal});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok)throw {code:j.error||"server",message:j.message||""};
+  return j.result;
+}
+function coachErr(e){
+  const c=e?.code||e?.message;
+  return ({not_granted:"You declined letting this page use AI, so the coach can't run. Reload the page to be asked again.",
+    rate_limited:"Too many analyses at once. Wait a minute, then try again.",
+    missing_key:"The coach isn't switched on for this site yet. The site owner needs to add an AI API key.",
+    images_unavailable:"This view can't send images to the AI. Open the page in a browser to use the coach.",
+    image_rejected:"The AI couldn't read those frames. Try a different clip or a few screenshots.",
+    bad_request:"Those frames couldn't be sent. Try a shorter clip.",
+    format:"This browser can't read that video. Export it as an MP4, or upload 3–6 screenshots of the run instead."}[c])
+    ||"The analysis didn't finish. Check your connection and try again.";
+}
+function coachMsg(t,err){$("#coachMsg").textContent=t;$("#coachMsg").className="msg"+(err?" err":"")}
+function topToday(){const d=season.days[todayKey()];return d&&d.runs.length?Math.max(...d.runs.map(r=>r.top)).toFixed(1):""}
+function renderCoachResult(r,{example=false,when=""}={}){
+  const el=$("#coachResult");$("#coachWhen").textContent=example?"":when;
+  if(r.visible===false){el.innerHTML=`<p class="msg err">The coach couldn't see a rider clearly in these frames. ${esc(r.limits||"")} Film from closer with the rider filling more of the frame, then try again.</p>`;return}
+  const arr=x=>Array.isArray(x)?x:[];
+  el.innerHTML=`<div style="display:flex;gap:6px;flex-wrap:wrap">${example?'<span class="pill warn">Example breakdown</span>':""}${r.level?`<span class="pill ok">${esc(r.level)}</span>`:""}</div>
+   <p class="verdict">${esc(r.verdict||"")}</p>
+   ${arr(r.strengths).length?`<h4 class="mini">Doing well</h4><ul class="goodlist">${arr(r.strengths).slice(0,3).map(s=>`<li>${esc(s)}</li>`).join("")}</ul>`:""}
+   <h4 class="mini">Fix these, in this order</h4>
+   ${arr(r.fixes).slice(0,3).map((f,i)=>`<div class="fix"><h3><i>${i+1}</i>${esc(f.issue||"")}</h3><p>${esc(f.why||"")}</p><p class="drill"><b>Drill:</b> ${esc(f.drill||"")}</p>${f.cue?`<span class="cue">Think: “${esc(f.cue)}”</span>`:""}</div>`).join("")}
+   ${r.next_run?`<div class="nextrun"><span>Next run</span>${esc(r.next_run)}</div>`:""}
+   ${r.limits?`<p class="msg">${esc(r.limits)}</p>`:""}`;
+}
+function renderCoachHist(){
+  const h=ls.get("cl.coach",[]);
+  $("#coachHist").innerHTML=h.length?h.map(x=>`<div class="hist"><b>${esc(x.run)} · ${esc(x.mtn)}</b><span class="meta">${new Date(x.ts).toLocaleDateString(undefined,{month:"short",day:"numeric"})}</span><p>${esc(x.level||"")}${x.level?" — ":""}${esc((x.cues||[]).join(" · "))}</p></div>`).join("")
+    :`<div class="empty">Your analyzed runs show up here with the cues to remember on the lift.</div>`;
+}
+function renderCoach(){
+  const keep=$("#coachRun").value;
+  $("#coachRun").innerHTML=M().runs.map(([n,d])=>`<option value="${esc(n)} (${DIFF[d]})">${esc(n)} · ${DIFF[d]}</option>`).join("")+`<option value="another run">Another run</option>`;
+  if([...$("#coachRun").options].some(o=>o.value===keep))$("#coachRun").value=keep;
+  if(!coach.real)renderCoachResult(COACH_EXAMPLE,{example:true});
+  renderCoachHist();
+}
+$("#coachFile").onchange=async e=>{
+  const files=[...e.target.files];e.target.value="";if(!files.length)return;
+  coach.frames=[];$("#coachFrames").innerHTML="";$("#coachFileName").textContent="";coachMsg("Pulling frames from your clip…");
+  try{
+    const isVid=files[0].type.startsWith("video/")||/\.(mov|mp4|m4v|webm)$/i.test(files[0].name);
+    const res=isVid?await framesFromVideo(files[0],6):await framesFromImages(files.filter(f=>f.type.startsWith("image/")).slice(0,6));
+    if(res.frames.length<2)throw new Error(isVid?"format":"few");
+    coach.frames=res.frames;coach.gap=res.gap;
+    $("#coachFileName").textContent=isVid?files[0].name:files.length+" photos";
+    $("#coachFrames").innerHTML=coach.frames.map(b=>`<img alt="Frame from your run" src="${URL.createObjectURL(b)}">`).join("");
+    coachMsg(`${coach.frames.length} frames ready. Set your level and run, then tap Analyze.`);
+  }catch(err){coachMsg(err.message==="few"?"Add at least 2 photos of the same run.":coachErr(err),true)}
+};
+$("#coachStop").onclick=()=>coach.ctl?.abort();
+$("#coachForm").onsubmit=async e=>{
+  e.preventDefault();if(coach.busy)return;
+  if(coach.frames.length<2){coachMsg("Choose a video or a few photos of your run first.",true);return}
+  const ctx={sport:$("#coachSport").value,level:$("#coachLevel").value,run:$("#coachRun").value,mtn:M().name,goal:$("#coachGoal").value.trim().slice(0,300),speed:topToday(),gap:(coach.gap||1).toFixed(1)};
+  coach.busy=true;coach.ctl=new AbortController();$("#coachGo").disabled=true;$("#coachStop").hidden=false;
+  coachMsg("Analyzing your run. This usually takes 10–40 seconds…");
+  try{
+    const r=await runCoach(ctx,coach.frames,coach.ctl.signal);
+    if(!r||typeof r!=="object")throw {code:"server"};
+    coach.real=true;renderCoachResult(r,{when:"Just now · "+ctx.mtn});
+    if(r.visible!==false){const h=ls.get("cl.coach",[]);h.unshift({ts:Date.now(),mtn:ctx.mtn,run:ctx.run,level:r.level||"",cues:(Array.isArray(r.fixes)?r.fixes:[]).map(f=>f.cue).filter(Boolean).slice(0,3)});ls.set("cl.coach",h.slice(0,8));renderCoachHist()}
+    coachMsg("Done. Work on fix #1 first.");
+  }catch(err){
+    if(err?.code==="cancelled"||err?.name==="AbortError")coachMsg("Stopped.");
+    else coachMsg(coachErr(err),true);
+  }finally{coach.busy=false;$("#coachGo").disabled=false;$("#coachStop").hidden=true}
+};
+
+/* ---------- boot ---------- */
+function renderAll(){renderPicker();renderMountain();renderTrack();renderReviews();loadMineIntoForm();renderCoach()}
+renderAll();
+{const v=location.hash.slice(1);setView(["mountain","track","coach","reviews"].includes(v)?v:"mountain")}
+$("#seasonSave").textContent="Saved on this device";
+
+(async()=>{
+  if(!window.claude?.use)return;
+  try{
+    [db,user]=await Promise.all([claude.use("db"),claude.use("user")]);
+    if(user){try{myId=await user.id()}catch(e){}}
+    if(!db)return renderReviews();
+    $("#revSubmit").disabled=false;$("#revMsg").textContent="";
+    let got=false;const timer=setTimeout(()=>{if(!got)$("#revMsg").textContent="Reviews are taking a while to load."},10000);
+    db.collection("reviews").onSnapshot(s=>{got=true;clearTimeout(timer);reviews={};s.docs.forEach(d=>reviews[d.id]=d.data());renderMountain();renderReviews();loadMineIntoForm()},()=>{got=true;clearTimeout(timer);$("#revMsg").textContent="Couldn't load reviews right now."});
+    if(myId){
+      try{const snap=await db.doc("data/users/"+myId+"/season").get();
+        if(snap.exists){const remote=snap.data().days||{};
+          // merge: keep the version of each day with more runs
+          for(const[k,v]of Object.entries(remote)){const l=season.days[k];if(!l||(v.runs||[]).length>=(l.runs||[]).length)season.days[k]=v}
+          ls.set("cl.season",season);$("#seasonSave").textContent="Saved to your account";renderTrack();
+        }else if(Object.keys(season.days).length)persistSeason();
+        else $("#seasonSave").textContent="Saved to your account";
+      }catch(e){}
+    }
+  }catch(e){}
+})();
+</script>
+
+</body>
+</html>
