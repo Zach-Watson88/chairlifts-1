@@ -1,4 +1,4 @@
-js
+
 // Chairlift AI Riding Coach — Vercel serverless function.
 // Receives up to 6 JPEG frames from a rider's video plus a few details,
 // asks Claude Haiku 5.5 to analyze technique, and returns JSON.
